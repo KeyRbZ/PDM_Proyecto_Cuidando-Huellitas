@@ -56,7 +56,7 @@ import com.pdm0126.cuidandohuellitas.ui.theme.VerdeDisabled
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Pet_Info() {
+fun Pet_Info(navBack: () -> Unit) {
     val focusManager = LocalFocusManager.current
 
     //placholders
@@ -82,7 +82,7 @@ fun Pet_Info() {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = "Regresar",
-                        modifier = Modifier.clickable { /*navBack()*/ },
+                        modifier = Modifier.clickable { navBack() },
                         tint = Blanco
                     )
                 },

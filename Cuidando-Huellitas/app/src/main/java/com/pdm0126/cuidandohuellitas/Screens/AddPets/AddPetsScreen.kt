@@ -77,7 +77,7 @@ import com.pdm0126.cuidandohuellitas.ui.theme.VerdeOscuro
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPet() {
+fun AddPet(navBack: () -> Unit) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     var petFile by rememberSaveable { mutableStateOf("") }
@@ -135,7 +135,7 @@ fun AddPet() {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = "Arrow back",
-                        modifier = Modifier.clickable { /*navBack()*/ },
+                        modifier = Modifier.clickable { navBack() },
                         tint = Blanco
                     )
                 },

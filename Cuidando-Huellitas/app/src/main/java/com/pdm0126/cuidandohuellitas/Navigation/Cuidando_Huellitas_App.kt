@@ -7,22 +7,35 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 
 import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
+import com.pdm0126.cuidandohuellitas.Screens.MainScreen.MainScreen
+import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
 
 
 @Composable
 fun Cuidando_Huellitas_App(){
-    val backStack = rememberNavBackStack(Routes.AddPet)
+    val backStack = rememberNavBackStack(Routes.MainScreen)
 
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
-            entry<Routes.AddPet> { key ->
-                AddPet()
-                //(
-                    //navBack = { backStack.removeLastOrNull() },
-                //)
+            entry<Routes.MainScreen> { key ->
+                MainScreen(
+                    navToPetInfo = { backStack.add(Routes.PetInfo) },
+                    navToAddPet = { backStack.add(Routes.AddPet) }
+                )
             }
+            entry<Routes.PetInfo> { key ->
+                Pet_Info(
+                    navBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<Routes.AddPet> { key ->
+                AddPet(
+                    navBack = { backStack.removeLastOrNull() }
+                )
+            }
+
         }
     )
 }

@@ -9,5 +9,9 @@ sealed class Routes: NavKey {
     data object AddPet : Routes()
     @Serializable
     data object PetType : Routes()
+    @Serializable
+    data object PetInfo : Routes()
+    @Serializable
+    data object MainScreen : Routes()
 
 }

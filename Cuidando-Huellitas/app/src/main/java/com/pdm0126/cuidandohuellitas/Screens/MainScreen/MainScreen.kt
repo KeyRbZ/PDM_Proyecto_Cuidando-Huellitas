@@ -1,6 +1,7 @@
 package com.pdm0126.cuidandohuellitas.Screens.MainScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -55,7 +56,7 @@ data class Mascotas(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navToPetInfo: () -> Unit, navToAddPet: () -> Unit ) {
     var selectedItem by remember { mutableStateOf("perfil") }
     val misMascotas = listOf(
         Mascotas("Firulais", "🐶"),
@@ -146,6 +147,7 @@ fun MainScreen() {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
+                    navToAddPet()
                 },
                 containerColor = Color(0xFF9dbf9e),
                 contentColor = Color(0xFFFAFCF2)
@@ -169,7 +171,8 @@ fun MainScreen() {
                 misMascotas.forEach { it->
                     item {
                         ElevatedCard(
-                            modifier = Modifier.padding(8.dp),
+                            modifier = Modifier.padding(8.dp)
+                                .clickable { navToPetInfo() },
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 8.dp),
                             colors = CardDefaults.cardColors(Color(0xFFFAFCF2))
@@ -205,8 +208,8 @@ fun MainScreen() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewMain(){
-    MainScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewMain(){
+//    MainScreen()
+//}
