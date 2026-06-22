@@ -1,5 +1,11 @@
 package com.pdm0126.cuidandohuellitas.Screens.AddPets
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,9 +28,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.outlined.CameraAlt
-import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -50,11 +55,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import coil3.compose.AsyncImage
 import com.pdm0126.cuidandohuellitas.Components.PetType
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
 import com.pdm0126.cuidandohuellitas.ui.theme.BlancoFocused
@@ -69,9 +78,36 @@ import com.pdm0126.cuidandohuellitas.ui.theme.VerdeOscuro
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPet() {
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     var petFile by rememberSaveable { mutableStateOf("") }
-    
+
+    //estados para la imagen de perfil
+    var selectedImage by rememberSaveable { mutableStateOf<Any?>(null) }
+    var showImageMenu by rememberSaveable { mutableStateOf(false) }
+
+    //galeria
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) selectedImage = uri
+    }
+
+    //Camara
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) selectedImage = bitmap
+    }
+    //permisos de camara
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            cameraLauncher.launch()
+        }
+    }
+
     // Estados para el menú de unidades de peso
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     var selectedUnit by rememberSaveable { mutableStateOf("kg") }
@@ -120,34 +156,92 @@ fun AddPet() {
                     detectTapGestures(onTap = { focusManager.clearFocus() })
                 }
                 .verticalScroll(rememberScrollState())
+                .padding(15.dp)
         ) {
-            //Perfil Pet
-            Column(modifier = Modifier.padding(10.dp)
-                .fillMaxSize()
-                .align(Alignment.CenterHorizontally),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center) {
-                Card(modifier = Modifier
-                    .size(150.dp)
-                    .clip(CircleShape)
-                    .clickable {  }
-                    .align(Alignment.CenterHorizontally)
-                    .border(1.dp, BordeTextField, CircleShape),
-                    shape = CircleShape,
-                    colors = CardDefaults.cardColors(containerColor = Blanco),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Icon(
-                        imageVector = Icons.Outlined.CameraAlt,
-                        contentDescription = "Foto de Perfil de mascota",
+            // Perfil Pet
+            Column(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box {
+                    Card(
                         modifier = Modifier
-                            .size(100.dp)
-                            .padding(8.dp)
-                            .fillMaxSize(),
-                        tint = VerdeOscuro
-                    )
-                }
+                            .size(150.dp)
+                            .clip(CircleShape)
+                            .clickable { showImageMenu = true }
+                            .border(1.dp, BordeTextField, CircleShape),
+                        shape = CircleShape,
+                        colors = CardDefaults.cardColors(containerColor = Blanco),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                            if (selectedImage != null) {
+                                AsyncImage(
+                                    model = selectedImage,
+                                    contentDescription = "Foto seleccionada",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Outlined.CameraAlt,
+                                    contentDescription = "Icono cámara",
+                                    modifier = Modifier.size(60.dp),
+                                    tint = VerdeOscuro
+                                )
+                            }
+                        }
+                    }
+
+                    //opciones de imagen de perfil
+                    DropdownMenu(
+                        expanded = showImageMenu,
+                        onDismissRequest = { showImageMenu = false },
+                        modifier = Modifier.background(Blanco)
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Tomar foto") },
+                            leadingIcon = { Icon(Icons.Outlined.CameraAlt, contentDescription = null) },
+                            onClick = {
+                                showImageMenu = false
+                                //pedir permiso
+                                val permissionCheckResult = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                                if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                                    cameraLauncher.launch()
+                                } else {
+                                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                                }
+                            },
+                            colors = MenuItemColors(
+                                textColor = NegroFocused,
+                                leadingIconColor = NegroFocused,
+                                trailingIconColor = NegroFocused,
+                                disabledTextColor = NegroFocused,
+                                disabledLeadingIconColor = NegroFocused,
+                                disabledTrailingIconColor = NegroFocused,
+                            )
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Elegir de galería") },
+                            leadingIcon = { Icon(Icons.Outlined.PhotoLibrary, contentDescription = null) },
+                            onClick = {
+                                showImageMenu = false
+                                galleryLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            },
+                            colors = MenuItemColors(
+                                textColor = NegroFocused,
+                                leadingIconColor = NegroFocused,
+                                trailingIconColor = NegroFocused,
+                                disabledTextColor = NegroFocused,
+                                disabledLeadingIconColor = NegroFocused,
+                                disabledTrailingIconColor = NegroFocused,
+                            )
+                        )
+                    }
                 }
             }
 
@@ -185,7 +279,8 @@ fun AddPet() {
                     onPetSelected = { 
                         petType = it
                         focusManager.clearFocus() // Al seleccionar tipo, cerramos teclado/foco
-                    }
+                    },
+                    selectedPet = petType
                 )
             }
 
@@ -246,8 +341,8 @@ fun AddPet() {
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
                                         .padding(end = 4.dp)
-                                        .clickable { 
-                                            isExpanded = true 
+                                        .clickable {
+                                            isExpanded = true
                                             focusManager.clearFocus() // Cerramos foco al abrir el menú
                                         }
                                 ) {
@@ -278,12 +373,12 @@ fun AddPet() {
                                     isExpanded = false
                                 },
                                 colors = MenuItemColors(
-                                    textColor = Negro,
-                                    leadingIconColor = Negro,
-                                    trailingIconColor = Negro,
-                                    disabledTextColor = Negro,
-                                    disabledLeadingIconColor = Negro,
-                                    disabledTrailingIconColor = Negro,
+                                    textColor = NegroFocused,
+                                    leadingIconColor = NegroFocused,
+                                    trailingIconColor = NegroFocused,
+                                    disabledTextColor = NegroFocused,
+                                    disabledLeadingIconColor = NegroFocused,
+                                    disabledTrailingIconColor = NegroFocused,
                                 )
                             )
                             DropdownMenuItem(
@@ -293,12 +388,12 @@ fun AddPet() {
                                     isExpanded = false
                                 },
                                 colors = MenuItemColors(
-                                    textColor = Negro,
-                                    leadingIconColor = Negro,
-                                    trailingIconColor = Negro,
-                                    disabledTextColor = Negro,
-                                    disabledLeadingIconColor = Negro,
-                                    disabledTrailingIconColor = Negro,
+                                    textColor = NegroFocused,
+                                    leadingIconColor = NegroFocused,
+                                    trailingIconColor = NegroFocused,
+                                    disabledTextColor = NegroFocused,
+                                    disabledLeadingIconColor = NegroFocused,
+                                    disabledTrailingIconColor = NegroFocused,
                                 )
                             )
                         }
@@ -309,9 +404,9 @@ fun AddPet() {
             Spacer(modifier = Modifier.height(20.dp))
 
             TextButton(
-                onClick = { 
+                onClick = {
                     focusManager.clearFocus()
-                    /* Lógica para guardar */ 
+                    /* Lógica para guardar */
                 },
                 modifier = Modifier
                     .fillMaxWidth()

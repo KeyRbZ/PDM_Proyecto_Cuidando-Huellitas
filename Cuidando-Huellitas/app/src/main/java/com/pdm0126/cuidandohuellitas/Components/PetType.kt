@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,7 +34,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
+import com.pdm0126.cuidandohuellitas.ui.theme.BlancoFocused
 import com.pdm0126.cuidandohuellitas.ui.theme.Verde
 
 data class PetsImages(
@@ -52,9 +57,10 @@ val dummyImages = listOf(
 )
 
 @Composable
-fun PetType(onPetSelected: (String) -> Unit) {
+fun PetType(onPetSelected: (String) -> Unit, selectedPet: String) {
     // Estado para el scroll de la lista
     val listState = rememberLazyListState()
+
 
     Box(
         modifier = Modifier.fillMaxWidth()
@@ -65,6 +71,7 @@ fun PetType(onPetSelected: (String) -> Unit) {
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {
             items(dummyImages) { pet ->
+                val isSelected = pet.description == selectedPet
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(horizontal = 8.dp)
@@ -75,7 +82,10 @@ fun PetType(onPetSelected: (String) -> Unit) {
                             .clip(CircleShape)
                             .clickable { onPetSelected(pet.description) },
                         shape = CircleShape,
-                        colors = CardDefaults.cardColors(containerColor = Blanco),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isSelected) BlancoFocused else Blanco
+                        )
+                            ,
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Box(
