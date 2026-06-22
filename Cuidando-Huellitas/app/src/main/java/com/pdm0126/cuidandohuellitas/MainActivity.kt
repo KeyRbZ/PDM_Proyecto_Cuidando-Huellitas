@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
+import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
 import com.pdm0126.cuidandohuellitas.ui.theme.CuidandoHuellitasTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CuidandoHuellitasTheme {
-                AddPet()
+                Pet_Info()
                 }
             }
         }
