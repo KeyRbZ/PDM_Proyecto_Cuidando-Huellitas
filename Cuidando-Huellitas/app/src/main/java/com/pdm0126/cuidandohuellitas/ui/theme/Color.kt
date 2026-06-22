@@ -13,9 +13,13 @@ val Pink40 = Color(0xFF7D5260)
 val Celeste = Color(0xFFeffafb)
 
 val Verde = Color(0xFF9dbf9e)
+val VerdeDisabled = Color(0xFFa7c5a8)
+val VerdeOscuro = Color(0xFF7e997e)
 
 val Blanco = Color(0xFFFAFCF2)
+val BlancoFocused = Color(0xFFEEEEE4)
 
 val Negro = Color(0xFF282e30)
+val NegroFocused = Color(0xFF3e4345)
 
 val BordeTextField = Color(0xFFe6f0f2)
