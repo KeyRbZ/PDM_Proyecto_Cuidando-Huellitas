@@ -10,7 +10,7 @@ sealed class Routes: NavKey {
     @Serializable
     data object PetType : Routes()
     @Serializable
-    data object PetInfo : Routes()
+    data class PetInfo(val petId: String) : Routes()
     @Serializable
     data object MainScreen : Routes()
 

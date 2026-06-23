@@ -1,5 +1,6 @@
 package com.pdm0126.cuidandohuellitas.Screens.Pet_Info
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,9 +22,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator // NUEVO
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,19 +36,26 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect // NUEVO
+import androidx.compose.runtime.collectAsState // NUEVO
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel // NUEVO
+import coil3.compose.AsyncImage
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
 import com.pdm0126.cuidandohuellitas.ui.theme.BlancoFocused
 import com.pdm0126.cuidandohuellitas.ui.theme.BordeTextField
@@ -53,24 +63,29 @@ import com.pdm0126.cuidandohuellitas.ui.theme.Celeste
 import com.pdm0126.cuidandohuellitas.ui.theme.Negro
 import com.pdm0126.cuidandohuellitas.ui.theme.Verde
 import com.pdm0126.cuidandohuellitas.ui.theme.VerdeDisabled
+import com.pdm0126.cuidandohuellitas.utils.ImageUtils.base64ToBitmap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Pet_Info(navBack: () -> Unit) {
+fun Pet_Info(
+    navBack: () -> Unit,
+    petId: String, //recibe el id de la mascota para cargar sus datos
+    viewModel: Pet_Info_ViewModel = viewModel(factory = Pet_Info_ViewModel.Factory)
+) {
     val focusManager = LocalFocusManager.current
 
-    //placholders
-    var petName by rememberSaveable { mutableStateOf("Luna") }
-    var petType by rememberSaveable { mutableStateOf("Gato") }
-    var petAge by rememberSaveable { mutableStateOf("2 años") }
-    var petWeight by rememberSaveable { mutableStateOf("4.5 kg") }
-
+    val pet by viewModel.pet.collectAsState()
+    //carga los datos al entrar a la pantalla
+    LaunchedEffect(petId) {
+        viewModel.getPetDetails(petId)
+    }
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = petName,
+                        //usa el nombre del ViewModel o vacío mientras carga
+                        text = pet?.name ?: "",
                         fontSize = 18.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
@@ -93,6 +108,7 @@ fun Pet_Info(navBack: () -> Unit) {
         },
         containerColor = Celeste
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -113,8 +129,29 @@ fun Pet_Info(navBack: () -> Unit) {
                     colors = CardDefaults.cardColors(containerColor = Blanco),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        //foto mascota
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        val bitmap = remember(pet?.photoUrl) {
+                            pet?.photoUrl?.base64ToBitmap()
+                        }
+                        if (bitmap != null) {
+                            Image(
+                                bitmap = bitmap.asImageBitmap(),
+                                contentDescription = pet?.name,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            // placeholder si no tiene foto
+                            Icon(
+                                imageVector = Icons.Default.Pets,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -146,13 +183,10 @@ fun Pet_Info(navBack: () -> Unit) {
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Text(text = "Nombre:", fontWeight = FontWeight.Medium, color = Negro)
                     Text(
-                        text = "Nombre:",
-                        fontWeight = FontWeight.Medium,
-                        color = Negro
-                    )
-                    Text(
-                        text = petName,
+                        //dato del ViewModel
+                        text = pet?.name ?: "",
                         fontWeight = FontWeight.Normal,
                         color = Negro
                     )
@@ -170,14 +204,13 @@ fun Pet_Info(navBack: () -> Unit) {
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Text(text = "Tipo:", fontWeight = FontWeight.Medium, color = Negro)
                     Text(
-                        text = "Tipo:",
-                        fontWeight = FontWeight.Medium,
-                        color = Negro)
-                    Text(
-                        text = petType,
+                        //dato del ViewModel
+                        text = pet?.type ?: "",
                         fontWeight = FontWeight.Normal,
-                        color = Negro)
+                        color = Negro
+                    )
                 }
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 20.dp),
@@ -192,14 +225,12 @@ fun Pet_Info(navBack: () -> Unit) {
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Text(text = "Edad:", fontWeight = FontWeight.Medium, color = Negro)
                     Text(
-                        text = "Edad:",
-                        fontWeight = FontWeight.Medium,
-                        color = Negro)
-                    Text(
-                        text = petAge,
+                        text = pet?.age.toString(),
                         fontWeight = FontWeight.Normal,
-                        color = Negro)
+                        color = Negro
+                    )
                 }
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 20.dp),
@@ -214,14 +245,13 @@ fun Pet_Info(navBack: () -> Unit) {
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Text(text = "Peso:", fontWeight = FontWeight.Medium, color = Negro)
                     Text(
-                        text = "Peso:",
-                        fontWeight = FontWeight.Medium,
-                        color = Negro)
-                    Text(
-                        text = petWeight,
+                        //dato del ViewModel
+                        text = pet?.weight.toString(),
                         fontWeight = FontWeight.Normal,
-                        color = Negro)
+                        color = Negro
+                    )
                 }
             }
 
@@ -257,9 +287,8 @@ fun Pet_Info(navBack: () -> Unit) {
                         fontWeight = FontWeight.Bold,
                         color = Blanco
                     )
-
                 }
             }
         }
     }
-}
+    }

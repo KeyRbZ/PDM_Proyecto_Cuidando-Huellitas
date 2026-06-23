@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 
     alias(libs.plugins.ksp)
+
+    //firebase
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -80,4 +83,20 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+
+    //firebase
+    implementation(libs.firebase.analytics)
+
+    //bd
+    // Firebase BOM (maneja versiones automáticamente)
+    implementation(platform(libs.firebase.bom))
+
+    // Firestore
+    implementation(libs.firebase.firestore)
+
+    // Autenticación
+    implementation(libs.firebase.auth)
+
+    //imagens
+    implementation(libs.firebase.storage)
 }

@@ -19,15 +19,18 @@ fun Cuidando_Huellitas_App(){
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
-            entry<Routes.MainScreen> { key ->
+            entry<Routes.MainScreen> {
                 MainScreen(
-                    navToPetInfo = { backStack.add(Routes.PetInfo) },
+                    navToPetInfo = { petId ->  //petId llega del callback
+                        backStack.add(Routes.PetInfo(petId = petId))
+                    },
                     navToAddPet = { backStack.add(Routes.AddPet) }
                 )
             }
             entry<Routes.PetInfo> { key ->
                 Pet_Info(
-                    navBack = { backStack.removeLastOrNull() }
+                    navBack = { backStack.removeLastOrNull() },
+                    petId = key.petId
                 )
             }
             entry<Routes.AddPet> { key ->

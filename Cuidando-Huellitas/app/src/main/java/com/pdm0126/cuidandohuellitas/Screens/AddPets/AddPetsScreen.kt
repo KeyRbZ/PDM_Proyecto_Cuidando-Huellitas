@@ -2,6 +2,8 @@ package com.pdm0126.cuidandohuellitas.Screens.AddPets
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,6 +41,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -46,8 +50,11 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,6 +70,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.pdm0126.cuidandohuellitas.Components.PetType
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
@@ -74,13 +82,34 @@ import com.pdm0126.cuidandohuellitas.ui.theme.NegroFocused
 import com.pdm0126.cuidandohuellitas.ui.theme.Verde
 import com.pdm0126.cuidandohuellitas.ui.theme.VerdeDisabled
 import com.pdm0126.cuidandohuellitas.ui.theme.VerdeOscuro
+import com.pdm0126.cuidandohuellitas.utils.ImageUtils.bitmapToUri
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPet(navBack: () -> Unit) {
+fun AddPet(navBack: () -> Unit,
+           viewModel: AddPetViewModel = viewModel(factory = AddPetViewModel.Factory)) {
+
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-    var petFile by rememberSaveable { mutableStateOf("") }
+    val guardadoExitoso by viewModel.guardadoExitoso.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+// Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(guardadoExitoso, error) {
+        when {
+            guardadoExitoso -> {
+                snackbarHostState.showSnackbar("¡Mascota agregada correctamente!")
+                viewModel.resetState()
+            }
+            error != null -> {
+                snackbarHostState.showSnackbar("Error: $error")
+                viewModel.resetState()
+            }
+        }
+    }
 
     //estados para la imagen de perfil
     var selectedImage by rememberSaveable { mutableStateOf<Any?>(null) }
@@ -119,6 +148,7 @@ fun AddPet(navBack: () -> Unit) {
     var petWeight by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -406,7 +436,18 @@ fun AddPet(navBack: () -> Unit) {
             TextButton(
                 onClick = {
                     focusManager.clearFocus()
-                    /* Lógica para guardar */
+                    val photoUri: Uri? = when (val image = selectedImage) {
+                        is Uri -> image
+                        is Bitmap -> bitmapToUri(context, image)
+                        else -> null
+                    }
+                    viewModel.addPet(
+                        name = petName,
+                        type = petType,
+                        age = petAge,
+                        weight = petWeight,
+                        photoUri = photoUri
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
