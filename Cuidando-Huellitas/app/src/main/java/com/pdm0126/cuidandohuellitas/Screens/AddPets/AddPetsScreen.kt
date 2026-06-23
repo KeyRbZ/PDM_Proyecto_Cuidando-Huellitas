@@ -445,7 +445,7 @@ fun AddPet(navBack: () -> Unit,
                         name = petName,
                         type = petType,
                         age = petAge,
-                        weight = petWeight,
+                        weight = "$petWeight $selectedUnit",
                         photoUri = photoUri
                     )
                 },
