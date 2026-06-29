@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "15043975471",
+    "project_id": "authscreen-pdm",
+    "storage_bucket": "authscreen-pdm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15043975471:android:bc9a1286916ccc445be9da",
+        "android_client_info": {
+          "package_name": "com.pdm0126.cuidandohuellitas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYBYjQRqCtzUw6_US5UePMvz4q_Tu40mc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
