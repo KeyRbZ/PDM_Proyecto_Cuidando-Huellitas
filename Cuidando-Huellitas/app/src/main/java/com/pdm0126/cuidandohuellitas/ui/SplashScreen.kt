@@ -56,7 +56,8 @@ fun SplashScreen(onNavigateToLogin: () -> Unit) {
 
                 Text(
                     text = "Cuidando\nHuellitas",
-                    lineHeight = 36.sp,
+                    fontSize = 38.sp,      // Un poco más grande para igualar la imagen
+                    lineHeight = 44.sp,    // Interlineado más amplio para que respire el texto
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineLarge.copy(
                         color = MaterialTheme.colorScheme.primary,
@@ -64,11 +65,13 @@ fun SplashScreen(onNavigateToLogin: () -> Unit) {
                     )
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = "Tu compañero en el cuidado de\nmascotas",
                     textAlign = TextAlign.Center,
+                    fontSize = 16.sp,      // Estrecha el texto idéntico al prototipo
+                    lineHeight = 22.sp,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Medium
@@ -78,12 +81,17 @@ fun SplashScreen(onNavigateToLogin: () -> Unit) {
 
             Row(
                 modifier = Modifier.padding(bottom = 48.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 val amarilloPunto = Color(0xFFF1C40F)
-                Box(modifier = Modifier.size(10.dp).background(amarilloPunto, CircleShape))
-                Box(modifier = Modifier.size(10.dp).background(amarilloPunto, CircleShape))
-                Box(modifier = Modifier.size(10.dp).background(amarilloPunto, CircleShape))
+
+                // Primer punto activo (tamaño 12dp)
+                Box(modifier = Modifier.size(12.dp).background(amarilloPunto, CircleShape))
+
+                // Segundo y tercer punto inactivos (tamaño 10dp y con opacidad/alpha)
+                Box(modifier = Modifier.size(10.dp).background(amarilloPunto.copy(alpha = 0.4f), CircleShape))
+                Box(modifier = Modifier.size(10.dp).background(amarilloPunto.copy(alpha = 0.4f), CircleShape))
             }
         }
     }
