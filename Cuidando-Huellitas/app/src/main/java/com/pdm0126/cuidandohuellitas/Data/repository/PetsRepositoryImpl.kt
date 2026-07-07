@@ -59,7 +59,7 @@ class PetsRepositoryImpl(
     }
 
     //Room , sincroniza desde Firestore primero
-    override fun getPets(): Flow<List<Pet>> {
+    override suspend fun getPets(): Flow<List<Pet>> {
         val userId = Firebase.auth.currentUser?.uid ?: ""
         return petsDao.getPetsByUser(userId)
             .map { list :List<PetEntity> -> list.map { it.toDomain() } }

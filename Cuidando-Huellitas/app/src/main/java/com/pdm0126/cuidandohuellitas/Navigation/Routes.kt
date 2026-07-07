@@ -13,5 +13,6 @@ sealed class Routes: NavKey {
     data class PetInfo(val petId: String) : Routes()
     @Serializable
     data object MainScreen : Routes()
-
+    @Serializable
+    data object Recordatorio : Routes()
 }

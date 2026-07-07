@@ -56,6 +56,7 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.runtime.remember
+import com.pdm0126.cuidandohuellitas.Components.BottomNavigationBar
 import com.pdm0126.cuidandohuellitas.utils.ImageUtils.base64ToBitmap
 
 
@@ -68,7 +69,8 @@ data class Mascotas(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navToPetInfo: (String) -> Unit, navToAddPet: () -> Unit,
+fun MainScreen(navToPetInfo: (String) -> Unit,
+               navToAddPet: () -> Unit,
                viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory)) {
     val pets by viewModel.pets.collectAsState()
 
@@ -95,68 +97,12 @@ fun MainScreen(navToPetInfo: (String) -> Unit, navToAddPet: () -> Unit,
             )
         },
         bottomBar = {
-            NavigationBar{
-
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { },
-                    icon = {
-                        Icon(
-                            Icons.Default.Home,
-                            contentDescription = "Inicio",
-                            tint= Color(0xFF9498A0)
-                        )
-                    }
-                )
-
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { },
-                    icon = {
-                        Icon(
-                            Icons.Default.FavoriteBorder,
-                            contentDescription = "Salud",
-                            tint= Color(0xFF9498A0)
-                        )
-                    }
-                )
-
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { },
-                    icon = {
-                        Icon(
-                            Icons.Default.DateRange,
-                            contentDescription = "Recordatorio" ,
-                            tint= Color(0xFF9498A0)
-                        )
-                    }
-                )
-
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { },
-                    icon = {
-                        Icon(
-                            Icons.Default.Lightbulb,
-                            contentDescription = "Consejos",
-                            tint= Color(0xFF9498A0)
-                        )
-                    }
-                )
-
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { },
-                    icon = {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = "Perfil",
-                            tint= Color(0xFF9498A0)
-                        )
-                    }
-                )
-            }
+            BottomNavigationBar(
+                navToHome = {},
+                navToReminders = {},
+                navToTips = {},
+                navToProfile = {}
+            )
         }
         ,
         floatingActionButton = {
