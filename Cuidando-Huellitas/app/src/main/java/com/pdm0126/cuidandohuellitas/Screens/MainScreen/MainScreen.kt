@@ -119,7 +119,7 @@ fun MainScreen(
         PullToRefresh(
             isRefreshing = isRefreshing,
             onRefresh = { viewModel.refreshPets() },
-            paddingValues = innerPadding,
+            //paddingValues = innerPadding,
             //modifier = Modifier.background(Color.Gray)
         ) {
             if(error!=null){
