@@ -64,8 +64,9 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
             _state.update { it.copy(errorMessage = "Las contraseñas no coinciden") }
             return
         }
-        if (current.password.length < 6) {
-            _state.update { it.copy(errorMessage = "La contraseña debe tener mínimo 6 caracteres") }
+        val passwordError = validatePasswordStrength(current.password)
+        if (passwordError != null) {
+            _state.update { it.copy(errorMessage = passwordError) }
             return
         }
         viewModelScope.launch {
@@ -75,6 +76,14 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
                 onFailure = { e -> _state.update { it.copy(isLoading = false, errorMessage = e.message ?: "Error al registrarse") } }
             )
         }
+    }
+
+    private fun validatePasswordStrength(password: String): String? {
+        if (password.length < 6) return "La contraseña debe tener mínimo 6 caracteres"
+        if (!password.any { it.isUpperCase() }) return "La contraseña debe tener al menos una mayúscula"
+        if (!password.any { it.isDigit() }) return "La contraseña debe tener al menos un número"
+        if (!password.any { !it.isLetterOrDigit() }) return "La contraseña debe tener al menos un carácter especial (ej. ! ? # @)"
+        return null
     }
 
     companion object {
@@ -217,7 +226,15 @@ fun RegisterScreen(
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(12.dp))
+
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "Debe incluir mayúscula, número y símbolo (ej. ?!#@)",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            )
+
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = state.confirmPassword,
