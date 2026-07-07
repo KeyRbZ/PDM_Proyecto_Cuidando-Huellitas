@@ -2,7 +2,6 @@ package com.pdm0126.cuidandohuellitas.Data.repository
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log.e
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.pdm0126.cuidandohuellitas.Data.Model.Pet
@@ -10,7 +9,6 @@ import com.pdm0126.cuidandohuellitas.Data.database.dao.PetsDao
 import com.pdm0126.cuidandohuellitas.Data.database.entities.PetEntity
 import com.pdm0126.cuidandohuellitas.Data.database.entities.toDomain
 import com.pdm0126.cuidandohuellitas.Data.database.entities.toEntity
-import com.pdm0126.cuidandohuellitas.Data.remote.api.Pet.PetApiDao
 import com.pdm0126.cuidandohuellitas.Data.remote.firebase.Pet.PetsFirestoreDao
 import com.pdm0126.cuidandohuellitas.Data.remote.firebase.storage.StorageDao
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +18,6 @@ import java.util.UUID
 class PetsRepositoryImpl(
     private val petsDao: PetsDao,
     private val petsFirestoreDao: PetsFirestoreDao,
-    private val petsApiDao: PetApiDao,
     private val storageDao: StorageDao,
     private val context: Context
 ) : PetInterface {
@@ -59,7 +56,7 @@ class PetsRepositoryImpl(
     }
 
     //Room , sincroniza desde Firestore primero
-    override suspend fun getPets(): Flow<List<Pet>> {
+    override fun getPets(): Result<List<Pet>> {
         val userId = Firebase.auth.currentUser?.uid ?: ""
         return petsDao.getPetsByUser(userId)
             .map { list :List<PetEntity> -> list.map { it.toDomain() } }

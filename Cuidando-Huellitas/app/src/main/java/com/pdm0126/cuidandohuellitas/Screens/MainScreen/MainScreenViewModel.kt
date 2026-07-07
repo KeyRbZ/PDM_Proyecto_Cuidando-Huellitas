@@ -25,6 +25,9 @@ class MainScreenViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     init {
         getPets()
     }
@@ -34,10 +37,26 @@ class MainScreenViewModel(
             _isLoading.value = true
             _error.value = null
             petInterface.getPets()
-                .collect { list ->
+                .onSuccess { list ->
                     _pets.value = list
-                    _isLoading.value = false
+                }.onFailure {
+                    _error.value = "Hola corazón bello, resulta que tus mascotas huyeron, traetelas presionando el botoncito pls"
                 }
+            _isLoading.value = false
+        }
+    }
+
+    fun refreshPets() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            _error.value = null
+            petInterface.getPets()
+                .onSuccess { list ->
+                    _pets.value = list
+                }.onFailure {
+                    _error.value = "Hola corazón bello, resulta que tus mascotas huyeron, traetelas presionando el botoncito pls"
+                }
+            _isRefreshing.value = false
         }
     }
 

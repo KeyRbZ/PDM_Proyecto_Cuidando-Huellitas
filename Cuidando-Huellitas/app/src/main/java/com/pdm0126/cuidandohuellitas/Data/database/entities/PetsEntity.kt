@@ -3,7 +3,9 @@ package com.pdm0126.cuidandohuellitas.Data.database.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.pdm0126.cuidandohuellitas.Data.Model.Pet
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(tableName = "pets")
 data class PetEntity(
     @PrimaryKey val id: String,
