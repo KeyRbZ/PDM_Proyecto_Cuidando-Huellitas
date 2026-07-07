@@ -69,6 +69,7 @@ import com.pdm0126.cuidandohuellitas.utils.ImageUtils.base64ToBitmap
 @Composable
 fun Pet_Info(
     navBack: () -> Unit,
+    navToHistorial: () -> Unit,
     petId: String, //recibe el id de la mascota para cargar sus datos
     viewModel: Pet_Info_ViewModel = viewModel(factory = Pet_Info_ViewModel.Factory)
 ) {
@@ -259,7 +260,7 @@ fun Pet_Info(
 
             // Botón Historial
             TextButton(
-                onClick = { /* Navegar a historial */ },
+                onClick = { navToHistorial() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp)

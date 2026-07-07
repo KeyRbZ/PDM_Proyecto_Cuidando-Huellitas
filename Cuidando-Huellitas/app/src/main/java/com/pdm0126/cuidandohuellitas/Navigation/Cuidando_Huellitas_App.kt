@@ -7,6 +7,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 
 import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
+import com.pdm0126.cuidandohuellitas.Screens.Historial.HistorialScreen
 import com.pdm0126.cuidandohuellitas.Screens.MainScreen.MainScreen
 import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
 
@@ -30,12 +31,22 @@ fun Cuidando_Huellitas_App(){
             entry<Routes.PetInfo> { key ->
                 Pet_Info(
                     navBack = { backStack.removeLastOrNull() },
+                    navToHistorial = { backStack.add(Routes.Recordatorio) },
                     petId = key.petId
                 )
             }
             entry<Routes.AddPet> { key ->
                 AddPet(
                     navBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<Routes.Recordatorio> { key ->
+                HistorialScreen(
+                    navBack = { backStack.removeLastOrNull() },
+                    userId = "",
+                    navToHome = {
+                        backStack.add(Routes.MainScreen)
+                    }
                 )
             }
 
