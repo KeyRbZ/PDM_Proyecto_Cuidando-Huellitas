@@ -1,6 +1,7 @@
 package com.pdm0126.cuidandohuellitas.Components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,7 +15,7 @@ import androidx.compose.ui.unit.dp
 fun PullToRefresh(
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
-    paddingValues: PaddingValues = PaddingValues(0.dp),
+    //paddingValues: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -22,8 +23,7 @@ fun PullToRefresh(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
         modifier = modifier
-            .fillMaxSize()
-            .padding(paddingValues)
+
     ) {
         content()
     }
