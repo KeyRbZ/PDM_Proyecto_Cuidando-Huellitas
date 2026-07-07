@@ -44,7 +44,9 @@ fun Cuidando_Huellitas_App(){
                 HistorialScreen(
                     navBack = { backStack.removeLastOrNull() },
                     userId = "",
-                    navToHome = { backStack.removeLastOrNull() }
+                    navToHome = {
+                        backStack.add(Routes.MainScreen)
+                    }
                 )
             }
 
