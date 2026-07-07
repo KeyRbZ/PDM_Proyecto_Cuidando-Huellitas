@@ -1,5 +1,11 @@
 package com.pdm0126.cuidandohuellitas.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,16 +16,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,11 +40,13 @@ import com.pdm0126.cuidandohuellitas.data.auth.AuthRepository
 import com.pdm0126.cuidandohuellitas.ui.theme.AmarilloAvatar
 import com.pdm0126.cuidandohuellitas.ui.theme.BordeTextField
 import androidx.lifecycle.viewModelScope
+import coil3.compose.AsyncImage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import androidx.activity.result.launch
 
 data class RegisterUiState(
     val name: String = "",
@@ -104,8 +117,24 @@ fun RegisterScreen(
     val viewModel: RegisterViewModel = viewModel(factory = RegisterViewModel.factory(app.authRepository))
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    var selectedAvatarIndex by remember { mutableStateOf(5) }
     val avatars = listOf("🐶", "🐱", "🐰", "🐦", "🐹", "🐟")
+    var selectedAvatarIndex by remember { mutableStateOf(0) }
+
+    // Si el usuario elige foto real, esto tiene prioridad sobre el emoji
+    var selectedImage by remember { mutableStateOf<Any?>(null) }
+    var showImageMenu by remember { mutableStateOf(false) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri -> if (uri != null) selectedImage = uri }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap -> if (bitmap != null) selectedImage = bitmap }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted -> if (isGranted) cameraLauncher.launch() }
 
     LaunchedEffect(state.isRegisterSuccess) {
         if (state.isRegisterSuccess) onRegisterSuccess()
@@ -146,21 +175,54 @@ fun RegisterScreen(
                 )
             )
 
+            Spacer(Modifier.height(20.dp))
+
+
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, BordeTextField, CircleShape),
+                    shape = CircleShape,
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        if (selectedImage != null) {
+                            AsyncImage(
+                                model = selectedImage,
+                                contentDescription = "Foto de perfil",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Text(avatars[selectedAvatarIndex], fontSize = 44.sp)
+                        }
+                    }
+                }
+            }
+
             Spacer(Modifier.height(16.dp))
-            Text("Selecciona tu avatar", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold)
+            Text("Selecciona tu avatar o sube tu foto", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
+
 
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 itemsIndexed(avatars) { index, avatar ->
+                    val isSelected = selectedImage == null && index == selectedAvatarIndex
                     Surface(
                         modifier = Modifier
                             .size(50.dp)
                             .border(
-                                width = if (index == selectedAvatarIndex) 3.dp else 0.dp,
-                                color = if (index == selectedAvatarIndex) AmarilloAvatar else Color.Transparent,
+                                width = if (isSelected) 3.dp else 0.dp,
+                                color = if (isSelected) AmarilloAvatar else Color.Transparent,
                                 shape = CircleShape
                             ),
                         shape = CircleShape,
@@ -168,9 +230,70 @@ fun RegisterScreen(
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
-                            modifier = Modifier.clickable { selectedAvatarIndex = index }
+                            modifier = Modifier.clickable {
+                                selectedAvatarIndex = index
+                                selectedImage = null
+                            }
                         ) {
                             Text(avatar, fontSize = 24.sp)
+                        }
+                    }
+                }
+
+                // Icono de cámara para tomar foto o elegir de galería
+                item {
+                    Box {
+                        Surface(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .border(
+                                    width = if (selectedImage != null) 3.dp else 0.dp,
+                                    color = if (selectedImage != null) AmarilloAvatar else Color.Transparent,
+                                    shape = CircleShape
+                                ),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.surface
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.clickable { showImageMenu = true }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.CameraAlt,
+                                    contentDescription = "Tomar o elegir foto",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                        }
+
+                        DropdownMenu(
+                            expanded = showImageMenu,
+                            onDismissRequest = { showImageMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Tomar foto") },
+                                leadingIcon = { Icon(Icons.Outlined.CameraAlt, contentDescription = null) },
+                                onClick = {
+                                    showImageMenu = false
+                                    val permissionCheckResult = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                                    if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                                        cameraLauncher.launch()
+                                    } else {
+                                        permissionLauncher.launch(Manifest.permission.CAMERA)
+                                    }
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Elegir de galería") },
+                                leadingIcon = { Icon(Icons.Outlined.PhotoLibrary, contentDescription = null) },
+                                onClick = {
+                                    showImageMenu = false
+                                    galleryLauncher.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                }
+                            )
                         }
                     }
                 }
