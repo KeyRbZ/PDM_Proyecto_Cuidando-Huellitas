@@ -16,6 +16,7 @@ import com.google.firebase.firestore.firestore
 import com.pdm0126.cuidandohuellitas.Navigation.Cuidando_Huellitas_App
 import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
 import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
+import com.pdm0126.cuidandohuellitas.Navigation.App
 import com.pdm0126.cuidandohuellitas.ui.theme.CuidandoHuellitasTheme
 
 val db = Firebase.firestore
