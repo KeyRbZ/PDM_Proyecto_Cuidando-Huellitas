@@ -3,6 +3,7 @@ package com.pdm0126.cuidandohuellitas.Screens.AddPets
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.icu.util.Calendar
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -157,6 +158,7 @@ fun AddPet(
     var petName by rememberSaveable { mutableStateOf("") }
     var petType by rememberSaveable { mutableStateOf("") }
     var petAge by rememberSaveable { mutableStateOf("") }
+    var petAgeByDate by rememberSaveable { mutableStateOf("") }
     var petWeight by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
