@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-
 import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
 import com.pdm0126.cuidandohuellitas.Screens.Historial.HistorialScreen
 import com.pdm0126.cuidandohuellitas.Screens.MainScreen.MainScreen
@@ -25,7 +24,8 @@ fun Cuidando_Huellitas_App(){
                     navToPetInfo = { petId ->  //petId llega del callback
                         backStack.add(Routes.PetInfo(petId = petId))
                     },
-                    navToAddPet = { backStack.add(Routes.AddPet) }
+                    navToAddPet = { backStack.add(Routes.AddPet) },
+                    navToProfile = {backStack.add(Routes.Profile)}
                 )
             }
             entry<Routes.PetInfo> { key ->

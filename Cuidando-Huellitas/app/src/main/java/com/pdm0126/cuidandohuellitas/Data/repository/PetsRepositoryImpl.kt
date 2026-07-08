@@ -14,6 +14,7 @@ import com.pdm0126.cuidandohuellitas.Data.remote.firebase.storage.StorageDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
+import kotlinx.coroutines.flow.first
 
 class PetsRepositoryImpl(
     private val petsDao: PetsDao,
@@ -56,10 +57,14 @@ class PetsRepositoryImpl(
     }
 
     //Room , sincroniza desde Firestore primero
-    override fun getPets(): Result<List<Pet>> {
-        val userId = Firebase.auth.currentUser?.uid ?: ""
-        return petsDao.getPetsByUser(userId)
-            .map { list :List<PetEntity> -> list.map { it.toDomain() } }
+    override suspend fun getPets(): Result<List<Pet>> {
+        return try {
+            val userId = Firebase.auth.currentUser?.uid ?: ""
+            val list = petsDao.getPetsByUser(userId).first()
+            Result.success(list.map { it.toDomain() })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     // NUEVO - para Pet_Info_ViewModel

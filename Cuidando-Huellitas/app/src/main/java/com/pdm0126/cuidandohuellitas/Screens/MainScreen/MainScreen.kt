@@ -15,11 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -27,8 +22,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -49,7 +42,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Button
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.runtime.remember
 import com.pdm0126.cuidandohuellitas.Components.BottomNavigationBar
 import com.pdm0126.cuidandohuellitas.Components.LoadingScreen
 import com.pdm0126.cuidandohuellitas.Components.PullToRefresh
@@ -60,9 +52,12 @@ import com.pdm0126.cuidandohuellitas.utils.ImageUtils.base64ToBitmap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navToPetInfo: (String) -> Unit,
-               navToAddPet: () -> Unit,
-               viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory)) {
+fun MainScreen(
+    navToPetInfo: (String) -> Unit,
+    navToAddPet: () -> Unit,
+    navToProfile: () -> Unit,
+    viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory)
+) {
     val pets by viewModel.pets.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -89,13 +84,12 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
         },
         bottomBar = {
             BottomNavigationBar(
-                navToHome = {},
-                navToReminders = {},
-                navToTips = {},
-                navToProfile = {}
+                navToHome = { },
+                navToReminders = { },
+                navToTips = {  },
+                navToProfile = { navToProfile() }
             )
-        }
-        ,
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -117,7 +111,7 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
             onRefresh = { viewModel.refreshPets() },
             paddingValues = innerPadding
         ) {
-            if(error!=null){
+            if(error != null){
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -125,17 +119,17 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
                         .background(Color.White),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center) {
+                    Text(
+                        text = "$error"
+                    )
+                    Button(onClick = { viewModel.getPets() }) {
                         Text(
-                            text = "$error"
+                            text = "Reintentar",
+                            color = Color.Black
                         )
-                        Button(onClick = { viewModel.getPets() }) {
-                            Text(
-                                text = "Reintentar",
-                                color = Color.Black
-                            )
-                        }
                     }
-            }else{
+                }
+            } else {
                 Column(Modifier.padding(innerPadding).fillMaxSize().padding(15.dp)) {
                     Text("Mis Mascotas",
                         fontSize = 28.sp,
@@ -146,7 +140,7 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
                         items(pets) { pet ->
                             ElevatedCard(
                                 modifier = Modifier.padding(8.dp)
-                                    .clickable { navToPetInfo( pet.id) },
+                                    .clickable { navToPetInfo(pet.id) },
                                 elevation = CardDefaults.cardElevation(
                                     defaultElevation = 8.dp),
                                 colors = CardDefaults.cardColors(Color(0xFFFAFCF2))
@@ -173,7 +167,6 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
                                                 contentScale = ContentScale.Crop
                                             )
                                         } else {
-                                            // placeholder si no tiene foto
                                             Icon(
                                                 imageVector = Icons.Default.Pets,
                                                 contentDescription = null,
@@ -190,7 +183,6 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
                             }
                         }
                     }
-
                 }
             }
         }

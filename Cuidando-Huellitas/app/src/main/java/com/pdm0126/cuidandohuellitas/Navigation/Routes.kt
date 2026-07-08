@@ -3,7 +3,8 @@ package com.pdm0126.cuidandohuellitas.Navigation
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-sealed class Routes: NavKey {
+sealed class
+Routes: NavKey {
 
     @Serializable
     data object AddPet : Routes()
@@ -15,4 +16,6 @@ sealed class Routes: NavKey {
     data object MainScreen : Routes()
     @Serializable
     data object Recordatorio : Routes()
+    @Serializable
+    data object Profile : Routes()
 }
