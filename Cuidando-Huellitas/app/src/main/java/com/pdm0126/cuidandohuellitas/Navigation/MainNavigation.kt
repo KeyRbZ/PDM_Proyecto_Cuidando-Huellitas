@@ -16,34 +16,7 @@ fun App() {
     NavDisplay(
         backStack = backStack,
         entryProvider = entryProvider {
-            entry<Routes.Splash> {
-                SplashScreen(onNavigateToLogin = {
-                    backStack.removeLastOrNull()
-                    backStack.add(Routes.Login)
-                })
-            }
-            entry<Routes.Login> {
-                LoginScreen(
-                    onLoginSuccess = {
-                        backStack.removeLastOrNull()
-                        backStack.add(Routes.Home)
-                    },
-                    onGoToRegister = { backStack.add(Routes.Register) },
-                    onGoToRecovery = { backStack.add(Routes.Recovery) }
-                )
-            }
-            entry<Routes.Register> {
-                RegisterScreen(
-                    onRegisterSuccess = {
-                        backStack.removeLastOrNull()
-                        backStack.add(Routes.Home)
-                    },
-                    onGoToLogin = { backStack.removeLastOrNull() }
-                )
-            }
-            entry<Routes.Recovery> {
-                RecoveryScreen(onGoToLogin = { backStack.removeLastOrNull() })
-            }
+
         }
     )
 }

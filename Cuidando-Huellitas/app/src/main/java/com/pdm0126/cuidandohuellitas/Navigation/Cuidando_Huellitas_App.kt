@@ -10,6 +10,10 @@ import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
 import com.pdm0126.cuidandohuellitas.Screens.Historial.HistorialScreen
 import com.pdm0126.cuidandohuellitas.Screens.MainScreen.MainScreen
 import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
+import com.pdm0126.cuidandohuellitas.ui.LoginScreen
+import com.pdm0126.cuidandohuellitas.ui.RecoveryScreen
+import com.pdm0126.cuidandohuellitas.ui.RegisterScreen
+import com.pdm0126.cuidandohuellitas.ui.SplashScreen
 
 
 @Composable
@@ -56,6 +60,34 @@ fun Cuidando_Huellitas_App(){
                         backStack.add(Routes.MainScreen)
                     }
                 )
+            }
+            entry<Routes.Splash> {
+                SplashScreen(onNavigateToLogin = {
+                    backStack.removeLastOrNull()
+                    backStack.add(Routes.Login)
+                })
+            }
+            entry<Routes.Login> {
+                LoginScreen(
+                    onLoginSuccess = {
+                        backStack.removeLastOrNull()
+                        backStack.add(Routes.Home)
+                    },
+                    onGoToRegister = { backStack.add(Routes.Register) },
+                    onGoToRecovery = { backStack.add(Routes.Recovery) }
+                )
+            }
+            entry<Routes.Register> {
+                RegisterScreen(
+                    onRegisterSuccess = {
+                        backStack.removeLastOrNull()
+                        backStack.add(Routes.Home)
+                    },
+                    onGoToLogin = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<Routes.Recovery> {
+                RecoveryScreen(onGoToLogin = { backStack.removeLastOrNull() })
             }
 
         }
