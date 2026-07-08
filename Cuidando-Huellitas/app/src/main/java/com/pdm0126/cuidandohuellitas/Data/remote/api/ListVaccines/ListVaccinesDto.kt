@@ -1,8 +1,10 @@
 package com.pdm0126.cuidandohuellitas.Data.remote.api.ListVaccines
 
 import com.pdm0126.cuidandohuellitas.Data.Model.ListVaccines
+import kotlinx.serialization.Serializable
 import kotlin.Int
 
+@Serializable
 data class ListVaccinesDto(
     val id: Int,
     val nameVac: String,

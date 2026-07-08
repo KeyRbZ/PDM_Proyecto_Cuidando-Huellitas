@@ -14,7 +14,7 @@ sealed class Routes: NavKey {
     @Serializable
     data object MainScreen : Routes()
     @Serializable
-    data object Historial : Routes()
+    data class Historial(val petId:String) : Routes()
     @Serializable
     data object Splash : Routes()
     @Serializable

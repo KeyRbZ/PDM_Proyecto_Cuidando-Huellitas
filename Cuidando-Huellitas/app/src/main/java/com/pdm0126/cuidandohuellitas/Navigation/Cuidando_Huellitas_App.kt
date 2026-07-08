@@ -42,7 +42,7 @@ fun Cuidando_Huellitas_App(){
                 Pet_Info(
                     navToHome = { backStack.add(Routes.MainScreen) },
                     navBack = { backStack.removeLastOrNull() },
-                    navToHistorial = { backStack.add(Routes.Historial) },
+                    navToHistorial = { petId -> backStack.add(Routes.Historial(petId=petId)) },
                     petId = key.petId
                 )
             }
@@ -66,7 +66,7 @@ fun Cuidando_Huellitas_App(){
                 HistorialScreen(
                     currentRoute = currentRoute as Routes,
                     navBack = { backStack.removeLastOrNull() },
-                    petId = "",
+                    petId = key.petId,
                     navToHome = {
                         backStack.add(Routes.MainScreen)
                     },
@@ -122,32 +122,3 @@ fun Cuidando_Huellitas_App(){
         }
     )
 }
-//
-//
-//fun RankeUCA_App() {
-//    val backStack = rememberNavBackStack(Routes.Question)
-//
-//    NavDisplay(
-//        backStack = backStack,
-//        onBack = { backStack.removeLastOrNull() },
-//        entryProvider = entryProvider {
-//            entry<Routes.Question> {
-//                QuestionsScreen(
-//                    onQuestionClick = { questionId ->
-//                        backStack.add(Routes.Options(questionId))
-//                    }
-//                )
-//            }
-//            entry<Routes.Options> { key ->
-//                OptionsScreen(
-//                    questionId = key.questionId,
-//                    navigateBack = { backStack.removeLastOrNull() }
-//                )
-//            }
-//        }
-//    )
-//}
-//
-//class RankeUCA_Application : Application(){
-//    val appProvider by lazy { AppProvider(this) }
-//}

@@ -67,7 +67,7 @@ import com.pdm0126.cuidandohuellitas.utils.calculateAge
 fun Pet_Info(
     navToHome: () -> Unit,
     navBack: () -> Unit,
-    navToHistorial: () -> Unit,
+    navToHistorial: (String) -> Unit,
     petId: String, //recibe el id de la mascota para cargar sus datos
     viewModel: Pet_Info_ViewModel = viewModel(factory = Pet_Info_ViewModel.Factory)
 ) {
@@ -296,7 +296,7 @@ fun Pet_Info(
 
             // Botón Historial
             TextButton(
-                onClick = { navToHistorial() },
+                onClick = { navToHistorial(petId) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp)
