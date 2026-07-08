@@ -64,6 +64,7 @@ import com.pdm0126.cuidandohuellitas.ui.theme.Negro
 import com.pdm0126.cuidandohuellitas.ui.theme.Verde
 import com.pdm0126.cuidandohuellitas.ui.theme.VerdeDisabled
 import com.pdm0126.cuidandohuellitas.utils.ImageUtils.base64ToBitmap
+import com.pdm0126.cuidandohuellitas.utils.calculateAge
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -228,7 +229,7 @@ fun Pet_Info(
                 ) {
                     Text(text = "Edad:", fontWeight = FontWeight.Medium, color = Negro)
                     Text(
-                        text = pet?.age.toString(),
+                        text = calculateAge(pet?.age ?: ""),//llamando a la funcion para calcular la edad en base a la fecha de la bd
                         fontWeight = FontWeight.Normal,
                         color = Negro
                     )

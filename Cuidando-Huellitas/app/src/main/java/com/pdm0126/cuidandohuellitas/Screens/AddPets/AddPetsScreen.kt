@@ -3,6 +3,7 @@ package com.pdm0126.cuidandohuellitas.Screens.AddPets
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.icu.util.Calendar
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -72,6 +73,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.pdm0126.cuidandohuellitas.Components.DatePickerDocked
+import com.pdm0126.cuidandohuellitas.Components.DatePickerFieldToModal
 import com.pdm0126.cuidandohuellitas.Components.PetType
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
 import com.pdm0126.cuidandohuellitas.ui.theme.BlancoFocused
@@ -140,11 +143,13 @@ fun AddPet(navBack: () -> Unit,
     // Estados para el menú de unidades de peso
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     var selectedUnit by rememberSaveable { mutableStateOf("kg") }
+    var selectedDate by rememberSaveable { mutableStateOf("año") }
 
     // Estados de los campos
     var petName by rememberSaveable { mutableStateOf("") }
     var petType by rememberSaveable { mutableStateOf("") }
     var petAge by rememberSaveable { mutableStateOf("") }
+    var petAgeByDate by rememberSaveable { mutableStateOf("") }
     var petWeight by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
@@ -321,25 +326,26 @@ fun AddPet(navBack: () -> Unit,
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = "Edad: ", fontWeight = FontWeight.Medium, color = Negro)
                     Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = petAge,
-                        onValueChange = { petAge = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(15.dp))
-                            .border(1.dp, BordeTextField, RoundedCornerShape(15.dp)),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = BlancoFocused,
-                            unfocusedContainerColor = Blanco,
-                            focusedIndicatorColor = BordeTextField,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = NegroFocused,
-                            unfocusedTextColor = if (petAge.isNotEmpty()) NegroFocused else Color.Transparent,
-                            cursorColor = Blanco
-                        ),
-                        placeholder = { Text(text = "Ejem: 1 año...") },
-                        singleLine = true
-                    )
+//                    TextField(
+//                        value = petAge,
+//                        onValueChange = { petAge = it },
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .clip(RoundedCornerShape(15.dp))
+//                            .border(1.dp, BordeTextField, RoundedCornerShape(15.dp)),
+//                        colors = TextFieldDefaults.colors(
+//                            focusedContainerColor = BlancoFocused,
+//                            unfocusedContainerColor = Blanco,
+//                            focusedIndicatorColor = BordeTextField,
+//                            unfocusedIndicatorColor = Color.Transparent,
+//                            focusedTextColor = NegroFocused,
+//                            unfocusedTextColor = if (petAge.isNotEmpty()) NegroFocused else Color.Transparent,
+//                            cursorColor = Blanco
+//                        ),
+//                        placeholder = { Text(text = "Ejem: 1 año...") },
+//                        singleLine = true
+//                    )
+                    DatePickerFieldToModal(petAge, onAgeSelected = { petAge = it })
                 }
 
                 Spacer(modifier = Modifier.width(10.dp))
