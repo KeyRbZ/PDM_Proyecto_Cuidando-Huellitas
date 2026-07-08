@@ -19,6 +19,9 @@ class Pet_Info_ViewModel(
     private val _pet = MutableStateFlow<Pet?>(null)
     val pet = _pet.asStateFlow()
 
+    private val _guardadoExitoso = MutableStateFlow<Boolean?>(null) // ← null en lugar de false
+    val guardadoExitoso = _guardadoExitoso.asStateFlow()
+
     private val _error = MutableStateFlow<String?>(null)
     val error = _error.asStateFlow()
 
@@ -29,7 +32,7 @@ class Pet_Info_ViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
-            
+
             // Llamada al repositorio que devuelve un Result<Pet>
             petInterface.getPetById(petId)
                 .onSuccess { petFound ->
@@ -42,6 +45,30 @@ class Pet_Info_ViewModel(
                 }
         }
     }
+
+    fun deletePet(petId: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            // Llamada al repositorio para eliminar la mascota
+            petInterface.deletePet(petId)
+                .onSuccess {
+                    _isLoading.value = false
+                    petInterface.syncPets()
+                    _guardadoExitoso.value = true
+                }
+                .onFailure { e ->
+                    _error.value = e.message ?: "Error al eliminar la mascota"
+                    _isLoading.value = false
+                }
+        }
+    }
+
+    fun resetState() {
+        _guardadoExitoso.value = null
+        _error.value = null
+    }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {

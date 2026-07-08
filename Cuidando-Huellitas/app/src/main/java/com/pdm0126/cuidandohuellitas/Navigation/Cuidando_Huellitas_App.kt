@@ -10,6 +10,11 @@ import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
 import com.pdm0126.cuidandohuellitas.Screens.Historial.HistorialScreen
 import com.pdm0126.cuidandohuellitas.Screens.MainScreen.MainScreen
 import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
+import com.pdm0126.cuidandohuellitas.Screens.Profile.ProfileScreen
+import com.pdm0126.cuidandohuellitas.ui.LoginScreen
+import com.pdm0126.cuidandohuellitas.ui.RecoveryScreen
+import com.pdm0126.cuidandohuellitas.ui.RegisterScreen
+import com.pdm0126.cuidandohuellitas.ui.SplashScreen
 import com.pdm0126.cuidandohuellitas.Screens.TipScreen.TipScreen
 
 
@@ -28,20 +33,33 @@ fun Cuidando_Huellitas_App(){
                     navToPetInfo = { petId -> backStack.add(Routes.PetInfo(petId = petId)) },
                     navToAddPet = { backStack.add(Routes.AddPet) },
                     //navToReminders = { backStack.add(Routes.Reminders) },
-                    navToTips = { backStack.add(Routes.Tips) },
+                    navToProfile = { backStack.add(Routes.Profile) },
+                    navToTips = { backStack.add(Routes.Tips) }
                     //navToProfile = { backStack.add(Routes.Profile) }
                 )
             }
             entry<Routes.PetInfo> { key ->
                 Pet_Info(
+                    navToHome = { backStack.add(Routes.MainScreen) },
                     navBack = { backStack.removeLastOrNull() },
                     navToHistorial = { backStack.add(Routes.Historial) },
                     petId = key.petId
                 )
             }
+            entry<Routes.PetTips> {
+//                PetTipsScreen(
+//                    navBack = { backStack.removeLastOrNull() },
+//                    navToHome = {
+//                        backStack.add(Routes.MainScreen)
+//                    }
+//                )
+            }
             entry<Routes.AddPet> { key ->
                 AddPet(
-                    navBack = { backStack.removeLastOrNull() }
+                    navBack = { backStack.removeLastOrNull() },
+                    navToHome = {
+                        backStack.add(Routes.MainScreen)
+                    }
                 )
             }
             entry<Routes.Historial> { key ->
@@ -51,7 +69,45 @@ fun Cuidando_Huellitas_App(){
                     petId = "",
                     navToHome = {
                         backStack.add(Routes.MainScreen)
-                    }
+                    },
+                    navToProfile = { backStack.add(Routes.Profile) },
+                    navToTips = { backStack.add(Routes.Tips) },
+                    navToVaccacines = {}
+                )
+            }
+            entry<Routes.Splash> {
+                SplashScreen(onNavigateToLogin = {
+                    backStack.removeLastOrNull()
+                    backStack.add(Routes.Login)
+                })
+            }
+            entry<Routes.Login> {
+                LoginScreen(
+                    onLoginSuccess = {
+                        backStack.removeLastOrNull()
+                        backStack.add(Routes.Home)
+                    },
+                    onGoToRegister = { backStack.add(Routes.Register) },
+                    onGoToRecovery = { backStack.add(Routes.Recovery) }
+                )
+            }
+            entry<Routes.Register> {
+                RegisterScreen(
+                    onRegisterSuccess = {
+                        backStack.removeLastOrNull()
+                        backStack.add(Routes.Home)
+                    },
+                    onGoToLogin = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<Routes.Recovery> {
+                RecoveryScreen(onGoToLogin = { backStack.removeLastOrNull() })
+            }
+            entry<Routes.Profile>{
+                ProfileScreen(
+                    currentRoute = currentRoute as Routes,
+                    navToTips = {backStack.add(Routes.Tips)},
+                    navToHome = { backStack.add(Routes.MainScreen) }
                 )
             }
             entry<Routes.Tips> {key ->
@@ -59,7 +115,7 @@ fun Cuidando_Huellitas_App(){
                     currentRoute = currentRoute as Routes,
                     navToHome = { backStack.add(Routes.MainScreen) },
                     //navToReminders = {},
-                    //navToProfile = {}
+                    navToProfile = {backStack.add(Routes.Profile)}
                 )
             }
 

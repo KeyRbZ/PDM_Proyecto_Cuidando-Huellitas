@@ -79,8 +79,7 @@ fun PetType(onPetSelected: (String) -> Unit, selectedPet: String) {
                         shape = CircleShape,
                         colors = CardDefaults.cardColors(
                             containerColor = if (isSelected) BlancoFocused else Blanco
-                        )
-                            ,
+                        ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Box(
@@ -122,9 +121,9 @@ fun PetType(onPetSelected: (String) -> Unit, selectedPet: String) {
                 tint = Blanco,
             )
         }
-        
+
         // Mostrar icono de flecha solo si hay más contenido a la izquierda
-        if(listState.canScrollBackward){
+        if (listState.canScrollBackward) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
                 contentDescription = "Más contenido izquierda",

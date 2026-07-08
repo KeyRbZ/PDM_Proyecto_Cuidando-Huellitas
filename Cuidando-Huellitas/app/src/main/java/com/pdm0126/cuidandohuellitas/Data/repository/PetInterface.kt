@@ -9,4 +9,6 @@ interface PetInterface {
     fun getPets(): Flow<List<Pet>>
     suspend fun getPetById(petId: String): Result<Pet>
     suspend fun syncPets(): Result<Unit>
+    suspend fun deletePet(petId: String): Result<Unit>
+
 }

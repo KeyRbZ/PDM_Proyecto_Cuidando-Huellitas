@@ -54,61 +54,6 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun DatePickerDocked(age: String) {
-    var petAge by remember { mutableStateOf("$age") }
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-    val selectedDate = datePickerState.selectedDateMillis?.let {
-        convertMillisToDate(it)
-    } ?: ""
-
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        TextField(
-            value = petAge,
-            onValueChange = { petAge = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(15.dp))
-                .border(1.dp, BordeTextField, RoundedCornerShape(15.dp)),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = BlancoFocused,
-                unfocusedContainerColor = Blanco,
-                focusedIndicatorColor = BordeTextField,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = NegroFocused,
-                unfocusedTextColor = if (petAge.isNotEmpty()) NegroFocused else Color.Transparent,
-                cursorColor = Blanco
-            ),
-            placeholder = { Text(text = "Ejem: 1 año...") },
-            singleLine = true
-        )
-
-        if (showDatePicker) {
-            Popup(
-                onDismissRequest = { showDatePicker = false },
-                alignment = Alignment.TopStart
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .offset(y = 64.dp)
-                        .shadow(elevation = 4.dp)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(16.dp)
-                ) {
-                    DatePicker(
-                        state = datePickerState,
-                        showModeToggle = false
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun DatePickerFieldToModal(age: String, onAgeSelected: (String) -> Unit) {
     var petAge by remember { mutableStateOf("") }
     var selectedDate by remember { mutableStateOf<Long?>(null) }
@@ -148,9 +93,11 @@ fun DatePickerFieldToModal(age: String, onAgeSelected: (String) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(15.dp))
-            .border(1.dp,
+            .border(
+                1.dp,
                 BordeTextField,
-                RoundedCornerShape(15.dp))
+                RoundedCornerShape(15.dp)
+            )
             .pointerInput(selectedDate) {
                 awaitEachGesture {
                     awaitFirstDown(pass = PointerEventPass.Initial)
@@ -193,20 +140,22 @@ fun DatePickerModal(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss,
-                ) {
+            TextButton(
+                onClick = onDismiss,
+            ) {
                 Text("Cancel", color = Verde)
 
             }
         },
         colors = DatePickerDefaults.colors(
-        containerColor = Blanco,
-        titleContentColor = Verde,
-        headlineContentColor = Verde,
+            containerColor = Blanco,
+            titleContentColor = Verde,
+            headlineContentColor = Verde,
 
-        )
+            )
     ) {
-        DatePicker(state = datePickerState,
+        DatePicker(
+            state = datePickerState,
             colors = DatePickerDefaults.colors(
                 containerColor = Blanco,
                 titleContentColor = Verde,
@@ -236,12 +185,13 @@ fun DatePickerModal(
                         focusedLabelColor = NegroFocused,
                         unfocusedLabelColor = BlancoFocused,
 
-                    )
+                        )
 
             )
         )
     }
 }
+
 fun convertMillisToDate(millis: Long): String {
     val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     return formatter.format(Date(millis))

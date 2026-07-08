@@ -23,3 +23,4 @@ val Negro = Color(0xFF282e30)
 val NegroFocused = Color(0xFF3e4345)
 
 val BordeTextField = Color(0xFFe6f0f2)
+val AmarilloAvatar = Color(0xFFF1C40F)

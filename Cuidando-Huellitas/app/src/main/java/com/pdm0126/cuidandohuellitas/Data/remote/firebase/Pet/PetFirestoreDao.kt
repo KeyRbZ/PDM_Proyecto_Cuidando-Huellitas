@@ -1,5 +1,3 @@
-// C:/Users/Sandra Garcia/Desktop/PDM_Proyecto_Cuidando-Huellitas/Cuidando-Huellitas/app/src/main/java/com/pdm0126/cuidandohuellitas/Data/remote/firebase/Pet/PetFirestoreDao.kt
-
 package com.pdm0126.cuidandohuellitas.Data.remote.firebase.Pet
 
 import com.google.firebase.Firebase
@@ -50,5 +48,22 @@ class PetsFirestoreDao {
                     photoUrl = doc.getString("photoUrl") ?: ""
                 )
             }
+    }
+
+    suspend fun deletePet(petId: String) {
+        db.collection("pets")
+            .document(petId)
+            .delete()
+            .await()
+    }
+
+    suspend fun getPetsByUser(): List<PetEntity> {
+        val userId = auth.currentUser?.uid ?: tempUserId
+
+        return db.collection("pets")
+            .whereEqualTo("userId", userId)
+            .get()
+            .await()
+            .toObjects(PetEntity::class.java)
     }
 }

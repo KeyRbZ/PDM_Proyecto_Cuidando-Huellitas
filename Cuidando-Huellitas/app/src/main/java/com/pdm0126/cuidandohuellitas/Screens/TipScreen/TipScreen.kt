@@ -1,7 +1,5 @@
 package com.pdm0126.cuidandohuellitas.Screens.TipScreen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,15 +17,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,13 +36,16 @@ import com.pdm0126.cuidandohuellitas.ui.theme.Verde
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TipScreen(viewModel: TipViewModel = viewModel(),
-              currentRoute: Routes, navToHome :() -> Unit) {
+fun TipScreen(
+    viewModel: TipViewModel = viewModel(),
+    navToProfile: () -> Unit,
+    currentRoute: Routes, navToHome: () -> Unit
+) {
     val tips by viewModel.tips.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    if(loading){
+    if (loading) {
         LoadingScreen("Consejos")
         return
     }
@@ -55,10 +53,14 @@ fun TipScreen(viewModel: TipViewModel = viewModel(),
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Consejos",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Blanco) },
+                title = {
+                    Text(
+                        "Consejos",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Blanco
+                    )
+                },
 
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Verde
@@ -71,7 +73,7 @@ fun TipScreen(viewModel: TipViewModel = viewModel(),
                 navToHome = { navToHome() },
                 navToReminders = {},
                 navToTips = {},
-                navToProfile = {}
+                navToProfile = { navToProfile() }
             )
         },
         containerColor = Celeste
@@ -85,7 +87,8 @@ fun TipScreen(viewModel: TipViewModel = viewModel(),
             items(tips) { tip ->
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth().padding(0.dp,10.dp),
+                        .fillMaxWidth()
+                        .padding(0.dp, 10.dp),
                     elevation = CardDefaults.cardElevation(
                         defaultElevation = 6.dp
                     ),

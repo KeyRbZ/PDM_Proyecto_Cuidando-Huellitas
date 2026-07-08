@@ -58,7 +58,10 @@ class PetsRepositoryImpl(
 
             petsFirestoreDao.addPet(newPet)
             petsDao.addPet(newPet.toEntity())
-            Log.d("FirebaseSuccess", "Mascota enviada correctamente a Firestore con ID de usuario: $userId")
+            Log.d(
+                "FirebaseSuccess",
+                "Mascota enviada correctamente a Firestore con ID de usuario: $userId"
+            )
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e("FirebaseError", "Error al añadir mascota: ${e.message}", e)
@@ -82,6 +85,21 @@ class PetsRepositoryImpl(
         }
     }
 
+    override suspend fun deletePet(petId: String): Result<Unit> {
+        return try {
+            val userId = getCurrentUserId()
+            petsFirestoreDao.deletePet(petId)
+            Log.d(
+                "FirebaseSuccess",
+                "Mascota eliminada correctamente de Firestore con ID de usuario: $userId"
+            )
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("FirebaseError", "Error al eliminar mascota: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
     override suspend fun syncPets(): Result<Unit> {
         return try {
             val userId = getCurrentUserId()
@@ -97,7 +115,7 @@ class PetsRepositoryImpl(
 
             //Re-poblar la base de datos local con lo que hay en Firestore
             remotePets.forEach { petsDao.addPet(it.toEntity()) }
-            
+
             Log.d("FirebaseSync", "Sincronización completada con éxito")
             Result.success(Unit)
         } catch (e: Exception) {
