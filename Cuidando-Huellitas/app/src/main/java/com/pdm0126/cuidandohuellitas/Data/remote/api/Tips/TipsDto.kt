@@ -1,10 +1,10 @@
-package com.pdm0126.cuidandohuellitas.Data.remote.api.Consejo
+package com.pdm0126.cuidandohuellitas.Data.remote.api.Tips
 
-import com.pdm0126.cuidandohuellitas.Data.Model.Consejo
+import com.pdm0126.cuidandohuellitas.Data.Model.Tip
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ConsejoDto(
+data class TipsDto(
     val id: Int,
     val title: String,
     val description: String,
@@ -12,8 +12,8 @@ data class ConsejoDto(
     val category: String,
     )
 
-fun ConsejoDto.toModel(): Consejo {
-    return Consejo(
+fun TipsDto.toModel(): Tip {
+    return Tip(
         id = id,
         title = title,
         description = description,
