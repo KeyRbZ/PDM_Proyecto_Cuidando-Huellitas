@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pdm0126.cuidandohuellitas.CuidandoHuellitasApp
+import com.pdm0126.cuidandohuellitas.CuidandoHuellitasApplication
 import com.pdm0126.cuidandohuellitas.data.auth.AuthRepository
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,7 +68,7 @@ class RecoveryViewModel(private val authRepository: AuthRepository) : ViewModel(
 @Composable
 fun RecoveryScreen(onGoToLogin: () -> Unit) {
     val context = LocalContext.current
-    val app = context.applicationContext as CuidandoHuellitasApp
+    val app = context.applicationContext as CuidandoHuellitasApplication
     val viewModel: RecoveryViewModel = viewModel(factory = RecoveryViewModel.factory(app.authRepository))
     val state by viewModel.state.collectAsStateWithLifecycle()
 

@@ -1,11 +1,15 @@
 package com.pdm0126.cuidandohuellitas.ui
 
+import androidx.activity.result.launch
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.MediaStore
+import android.util.Base64
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -35,8 +39,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pdm0126.cuidandohuellitas.CuidandoHuellitasApp
+import com.pdm0126.cuidandohuellitas.CuidandoHuellitasApplication
 import com.pdm0126.cuidandohuellitas.data.auth.AuthRepository
+import com.pdm0126.cuidandohuellitas.data.auth.UsersFirestoreDao
 import com.pdm0126.cuidandohuellitas.ui.theme.AmarilloAvatar
 import com.pdm0126.cuidandohuellitas.ui.theme.BordeTextField
 import androidx.lifecycle.viewModelScope
@@ -46,7 +51,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import androidx.activity.result.launch
+import java.io.ByteArrayOutputStream
 
 data class RegisterUiState(
     val name: String = "",
@@ -67,7 +72,8 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
     fun onPasswordChange(value: String) = _state.update { it.copy(password = value, errorMessage = null) }
     fun onConfirmPasswordChange(value: String) = _state.update { it.copy(confirmPassword = value, errorMessage = null) }
 
-    fun onRegisterClick() {
+    // Recibe el avatar ya resuelto: el emoji elegido, o la foto convertida a texto (Base64)
+    fun onRegisterClick(avatarValue: String) {
         val current = _state.value
         if (current.name.isBlank() || current.email.isBlank() || current.password.isBlank()) {
             _state.update { it.copy(errorMessage = "Completa todos los campos") }
@@ -85,7 +91,17 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             authRepository.register(current.email, current.password).fold(
-                onSuccess = { _state.update { it.copy(isLoading = false, isRegisterSuccess = true) } },
+                onSuccess = {
+                    val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+                    if (uid != null) {
+                        try {
+                            UsersFirestoreDao().saveUser(uid, current.name, avatarValue, current.email)
+                        } catch (e: Exception) {
+                            // Si falla guardar en Firestore, no bloqueamos el registro del usuario
+                        }
+                    }
+                    _state.update { it.copy(isLoading = false, isRegisterSuccess = true) }
+                },
                 onFailure = { e -> _state.update { it.copy(isLoading = false, errorMessage = e.message ?: "Error al registrarse") } }
             )
         }
@@ -107,13 +123,21 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
     }
 }
 
+// Convierte una foto real (Bitmap) a texto Base64, mismo patrón usado en Add-Pet
+private fun bitmapToBase64(bitmap: Bitmap): String {
+    val resized = Bitmap.createScaledBitmap(bitmap, 200, 200, true)
+    val stream = ByteArrayOutputStream()
+    resized.compress(Bitmap.CompressFormat.JPEG, 40, stream)
+    return Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT)
+}
+
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onGoToLogin: () -> Unit
 ) {
     val context = LocalContext.current
-    val app = context.applicationContext as CuidandoHuellitasApp
+    val app = context.applicationContext as CuidandoHuellitasApplication
     val viewModel: RegisterViewModel = viewModel(factory = RegisterViewModel.factory(app.authRepository))
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -177,7 +201,7 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(20.dp))
 
-
+            // Círculo grande: muestra la foto real si existe, si no el emoji seleccionado
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -210,7 +234,7 @@ fun RegisterScreen(
             Text("Selecciona tu avatar o sube tu foto", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
-
+            // Fila de opciones: avatares predeterminados + opción de cámara/galería al final
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -232,7 +256,7 @@ fun RegisterScreen(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.clickable {
                                 selectedAvatarIndex = index
-                                selectedImage = null
+                                selectedImage = null // al elegir emoji, se descarta la foto
                             }
                         ) {
                             Text(avatar, fontSize = 24.sp)
@@ -240,7 +264,7 @@ fun RegisterScreen(
                     }
                 }
 
-                // Icono de cámara para tomar foto o elegir de galería
+                // Última opción: ícono de cámara para tomar foto o elegir de galería
                 item {
                     Box {
                         Surface(
@@ -386,7 +410,19 @@ fun RegisterScreen(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
                 Button(
-                    onClick = viewModel::onRegisterClick,
+                    onClick = {
+                        // Se resuelve aquí, al momento de registrar, cuál avatar mandar:
+                        // la foto convertida a texto (Base64), o el emoji elegido.
+                        val avatarValue: String = when (val image = selectedImage) {
+                            is Uri -> {
+                                val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, image)
+                                bitmapToBase64(bitmap)
+                            }
+                            is Bitmap -> bitmapToBase64(image)
+                            else -> avatars[selectedAvatarIndex]
+                        }
+                        viewModel.onRegisterClick(avatarValue)
+                    },
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     modifier = Modifier.fillMaxWidth().height(50.dp)

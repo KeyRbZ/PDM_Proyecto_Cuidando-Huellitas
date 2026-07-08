@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pdm0126.cuidandohuellitas.CuidandoHuellitasApp
+import com.pdm0126.cuidandohuellitas.CuidandoHuellitasApplication
 import com.pdm0126.cuidandohuellitas.data.auth.AuthRepository
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
@@ -76,7 +76,7 @@ fun LoginScreen(
     onGoToRecovery: () -> Unit
 ) {
     val context = LocalContext.current
-    val app = context.applicationContext as CuidandoHuellitasApp
+    val app = context.applicationContext as CuidandoHuellitasApplication
     val viewModel: LoginViewModel = viewModel(factory = LoginViewModel.factory(app.authRepository))
     val state by viewModel.state.collectAsStateWithLifecycle()
 
