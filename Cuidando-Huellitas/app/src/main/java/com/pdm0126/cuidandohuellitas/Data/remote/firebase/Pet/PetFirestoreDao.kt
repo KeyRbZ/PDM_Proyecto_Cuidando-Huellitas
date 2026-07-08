@@ -1,25 +1,23 @@
-// C:/Users/Sandra Garcia/Desktop/PDM_Proyecto_Cuidando-Huellitas/Cuidando-Huellitas/app/src/main/java/com/pdm0126/cuidandohuellitas/Data/remote/firebase/Pet/PetFirestoreDao.kt
-
 package com.pdm0126.cuidandohuellitas.Data.remote.firebase.Pet
 
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.snapshots
 import com.pdm0126.cuidandohuellitas.Data.Model.Pet
 import com.pdm0126.cuidandohuellitas.Data.database.entities.PetEntity
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
 class PetsFirestoreDao {
-private val db = Firebase.firestore
+    private val db = Firebase.firestore
     private val auth = Firebase.auth
 
-    suspend fun addPet(pet: Pet) { //recibe Pet en lugar de parámetros separados
+    // Temporal hasta implementar Auth
+    private val tempUserId = "usuario_temporal_123"
+
+    suspend fun addPet(pet: Pet) {
         val petMap = hashMapOf(
             "id" to pet.id,
-            "userId" to pet.userId,
+            "userId" to (auth.currentUser?.uid ?: tempUserId),
             "name" to pet.name,
             "type" to pet.type,
             "age" to pet.age,
@@ -28,13 +26,13 @@ private val db = Firebase.firestore
         )
 
         db.collection("pets")
-            .document(pet.id)  // usa el id del Pet para el documento
+            .document(pet.id)
             .set(petMap)
             .await()
     }
 
     suspend fun getPets(): List<Pet> {
-        val userId = auth.currentUser?.uid ?: return emptyList()
+        val userId = auth.currentUser?.uid ?: tempUserId
         return db.collection("pets")
             .whereEqualTo("userId", userId)
             .get()
@@ -52,8 +50,15 @@ private val db = Firebase.firestore
             }
     }
 
+    suspend fun deletePet(petId: String) {
+        db.collection("pets")
+            .document(petId)
+            .delete()
+            .await()
+    }
+
     suspend fun getPetsByUser(): List<PetEntity> {
-        val userId = auth.currentUser?.uid ?: return emptyList()
+        val userId = auth.currentUser?.uid ?: tempUserId
 
         return db.collection("pets")
             .whereEqualTo("userId", userId)

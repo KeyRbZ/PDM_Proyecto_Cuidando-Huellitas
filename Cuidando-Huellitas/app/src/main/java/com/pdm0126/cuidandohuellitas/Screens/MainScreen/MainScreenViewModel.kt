@@ -29,20 +29,21 @@ class MainScreenViewModel(
     val isRefreshing = _isRefreshing.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            _isLoading.value = true
+            petInterface.syncPets()//sincroniza
+            _isLoading.value = false //falso el loading
+        }
         getPets()
     }
 
     fun getPets() {
         viewModelScope.launch {
-            _isLoading.value = true
             _error.value = null
             petInterface.getPets()
-                .onSuccess { list ->
+                .collect { list ->
                     _pets.value = list
-                }.onFailure {
-                    _error.value = "Hola corazón bello, resulta que tus mascotas huyeron, traetelas presionando el botoncito pls"
                 }
-            _isLoading.value = false
         }
     }
 
@@ -50,11 +51,9 @@ class MainScreenViewModel(
         viewModelScope.launch {
             _isRefreshing.value = true
             _error.value = null
-            petInterface.getPets()
-                .onSuccess { list ->
-                    _pets.value = list
-                }.onFailure {
-                    _error.value = "Hola corazón bello, resulta que tus mascotas huyeron, traetelas presionando el botoncito pls"
+            petInterface.syncPets()
+                .onFailure { e ->
+                    _error.value = "Error al sincronizar: ${e.message}"
                 }
             _isRefreshing.value = false
         }

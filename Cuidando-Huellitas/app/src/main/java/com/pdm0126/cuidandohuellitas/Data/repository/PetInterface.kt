@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface PetInterface {
     suspend fun addPet(photoUri: Uri?, name: String, type: String, age: String, weight: String): Result<Unit>
-    fun getPets(): Result<List<Pet>>
+    fun getPets(): Flow<List<Pet>>
     suspend fun getPetById(petId: String): Result<Pet>
     suspend fun syncPets(): Result<Unit>
+    suspend fun deletePet(petId: String): Result<Unit>
+
 }

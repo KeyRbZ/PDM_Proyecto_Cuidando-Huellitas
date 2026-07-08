@@ -3,7 +3,7 @@ package com.pdm0126.cuidandohuellitas.Data.Model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Consejo(
+data class Tip(
     val id: Int,
     val title: String,
     val description: String,

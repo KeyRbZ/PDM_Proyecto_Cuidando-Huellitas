@@ -1,7 +1,9 @@
 package com.pdm0126.cuidandohuellitas.Screens.MainScreen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,20 +17,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -40,19 +36,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.Button
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.runtime.remember
 import com.pdm0126.cuidandohuellitas.Components.BottomNavigationBar
 import com.pdm0126.cuidandohuellitas.Components.LoadingScreen
 import com.pdm0126.cuidandohuellitas.Components.PullToRefresh
+import com.pdm0126.cuidandohuellitas.Navigation.Routes
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
 import com.pdm0126.cuidandohuellitas.ui.theme.Celeste
 import com.pdm0126.cuidandohuellitas.ui.theme.Verde
@@ -60,16 +53,23 @@ import com.pdm0126.cuidandohuellitas.utils.ImageUtils.base64ToBitmap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navToPetInfo: (String) -> Unit,
-               navToAddPet: () -> Unit,
-               viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory)) {
+fun MainScreen(
+    currentRoute: Routes,
+    navToPetInfo: (String) -> Unit,
+    navToAddPet: () -> Unit,
+    viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory),
+    navToProfile: () -> Unit,
+    navToTips: () -> Unit
+) {
+
+
     val pets by viewModel.pets.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    if (loading){
-        LoadingScreen()
+    if (loading) {
+        LoadingScreen("Cuidando Huellitas")
         return
     }
 
@@ -77,10 +77,14 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
         containerColor = Celeste,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Cuidando Huellitas",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Blanco) },
+                title = {
+                    Text(
+                        "Cuidando Huellitas",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Blanco
+                    )
+                },
 
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Verde
@@ -89,13 +93,13 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
         },
         bottomBar = {
             BottomNavigationBar(
+                currentRoute = currentRoute as Routes,
                 navToHome = {},
                 navToReminders = {},
-                navToTips = {},
-                navToProfile = {}
+                navToProfile = { navToProfile() },
+                navToTips = { navToTips() },
             )
-        }
-        ,
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -115,40 +119,63 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
         PullToRefresh(
             isRefreshing = isRefreshing,
             onRefresh = { viewModel.refreshPets() },
-            paddingValues = innerPadding
+            //paddingValues = innerPadding,
+            //modifier = Modifier.background(Color.Gray)
         ) {
-            if(error!=null){
+            if (error != null) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp)
                         .background(Color.White),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center) {
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "$error"
+
+                    )
+                    Button(onClick = { viewModel.getPets() }) {
                         Text(
-                            text = "$error"
+                            text = "Reintentar",
+                            color = Color.Black
                         )
-                        Button(onClick = { viewModel.getPets() }) {
-                            Text(
-                                text = "Reintentar",
-                                color = Color.Black
-                            )
-                        }
                     }
-            }else{
-                Column(Modifier.padding(innerPadding).fillMaxSize().padding(15.dp)) {
-                    Text("Mis Mascotas",
+                }
+            } else {
+                Column(
+                    Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+
+                    Text(
+                        "Mis Mascotas",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF9dbf9e))
+                        color = Color(0xFF9dbf9e)
+                    )
 
-                    LazyRow(Modifier.fillMaxWidth()){
+                    LazyRow(Modifier.fillMaxWidth()) {
+                        if (pets.isEmpty()) {
+                            item {
+                                Text(
+                                    "No hay mascotas",
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Blanco
+                                )
+                            }
+                        }
                         items(pets) { pet ->
                             ElevatedCard(
-                                modifier = Modifier.padding(8.dp)
-                                    .clickable { navToPetInfo( pet.id) },
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .clickable { navToPetInfo(pet.id) },
                                 elevation = CardDefaults.cardElevation(
-                                    defaultElevation = 8.dp),
+                                    defaultElevation = 8.dp
+                                ),
                                 colors = CardDefaults.cardColors(Color(0xFFFAFCF2))
                             ) {
                                 Column(
