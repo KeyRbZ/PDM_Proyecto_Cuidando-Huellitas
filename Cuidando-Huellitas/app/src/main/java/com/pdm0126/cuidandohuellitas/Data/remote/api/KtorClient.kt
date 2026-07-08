@@ -26,7 +26,7 @@ object KtorClient {
         }
         defaultRequest {
             url(BASE_URL)
-            header(HttpHeaders.Authorization,"Bearer ${BuildConfig.API_TOKEN}")
+            header("apikey", BuildConfig.API_Key)
             header(HttpHeaders.Accept, "application/json")
         }
     }

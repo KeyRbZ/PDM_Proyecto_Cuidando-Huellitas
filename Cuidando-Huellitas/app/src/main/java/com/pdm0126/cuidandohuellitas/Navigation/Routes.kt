@@ -28,4 +28,6 @@ sealed class Routes: NavKey {
     data object Recordatorio : Routes()
     @Serializable
     data object Profile : Routes()
+    @Serializable
+    data object Tips: Routes()
 }

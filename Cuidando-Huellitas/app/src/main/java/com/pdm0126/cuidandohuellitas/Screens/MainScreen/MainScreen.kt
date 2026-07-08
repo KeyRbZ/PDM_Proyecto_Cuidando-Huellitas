@@ -59,15 +59,18 @@ fun MainScreen(
     navToPetInfo: (String) -> Unit,
     navToAddPet: () -> Unit,
     viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory),
-    navToProfile: () -> Unit)
-   {
+    navToProfile: () -> Unit,
+navToTips:()->Unit)
+{
+
+
     val pets by viewModel.pets.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val error by viewModel.error.collectAsState()
 
     if (loading){
-        LoadingScreen()
+        LoadingScreen("Cuidando Huellitas")
         return
     }
 
@@ -90,8 +93,8 @@ fun MainScreen(
                 currentRoute = currentRoute as Routes,
                 navToHome = {},
                 navToReminders = {},
-                navToTips = {},
                 navToProfile = {navToProfile()}
+                navToTips = {navToTips()},
             )
         }
         ,
@@ -117,7 +120,7 @@ fun MainScreen(
             //paddingValues = innerPadding,
             //modifier = Modifier.background(Color.Gray)
         ) {
-            if(error != null){
+            if(error!=null){
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -204,6 +207,7 @@ fun MainScreen(
                             }
                         }
                     }
+
                 }
             }
         }

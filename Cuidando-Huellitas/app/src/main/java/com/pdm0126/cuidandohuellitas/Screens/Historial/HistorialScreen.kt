@@ -92,5 +92,5 @@ fun HistorialScreen(
                 Box(Modifier.padding(innerPadding)){
                     Text("hola corazon bello")
                 }
-            }
+    }
 }

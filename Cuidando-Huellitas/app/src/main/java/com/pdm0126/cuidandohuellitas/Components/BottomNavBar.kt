@@ -75,15 +75,14 @@ fun BottomNavigationBar(
         )
 
         NavigationBarItem(
-            selected = false,
-            //currentRoute is Routes.Tips,
+            selected = currentRoute is Routes.Tips,
             onClick = { navToTips() },
             icon = {
                 Icon(
                     Icons.Default.Lightbulb,
                     contentDescription = "Consejos",
-                    tint = NegroFocused
-                    //if (currentRoute is Routes.Tips) Verde else NegroFocused
+                    tint =
+                    if (currentRoute is Routes.Tips) Verde else NegroFocused
                 )
             },
             colors = NavigationBarItemDefaults.colors(
