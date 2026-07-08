@@ -10,8 +10,9 @@ import com.pdm0126.cuidandohuellitas.Data.repository.PetsRepositoryImpl
 import com.pdm0126.cuidandohuellitas.Data.repository.ProfileInterface
 import com.pdm0126.cuidandohuellitas.Data.repository.ProfileRepositoryImpl
 
-class AppProvider(private val db: AppDatabase,
-                  private val context: Context
+class AppProvider(
+    private val db: AppDatabase,
+    private val context: Context
 ) {
 
     fun providePetRepository(): PetInterface {

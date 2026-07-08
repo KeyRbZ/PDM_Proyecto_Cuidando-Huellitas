@@ -3,7 +3,6 @@ package com.pdm0126.cuidandohuellitas.Screens.AddPets
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.icu.util.Calendar
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -13,7 +12,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -73,7 +71,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
-import com.pdm0126.cuidandohuellitas.Components.DatePickerDocked
 import com.pdm0126.cuidandohuellitas.Components.DatePickerFieldToModal
 import com.pdm0126.cuidandohuellitas.Components.LoadingScreen
 import com.pdm0126.cuidandohuellitas.Components.PetType
@@ -91,9 +88,11 @@ import com.pdm0126.cuidandohuellitas.utils.ImageUtils.bitmapToUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPet(navBack: () -> Unit,
-           navToHome: () -> Unit,
-           viewModel: AddPetViewModel = viewModel(factory = AddPetViewModel.Factory)) {
+fun AddPet(
+    navBack: () -> Unit,
+    navToHome: () -> Unit,
+    viewModel: AddPetViewModel = viewModel(factory = AddPetViewModel.Factory)
+) {
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -101,8 +100,8 @@ fun AddPet(navBack: () -> Unit,
     val error by viewModel.error.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
 
-    if (loading){
-        LoadingScreen()
+    if (loading) {
+        LoadingScreen("Agregar Macota")
         return
     }
 
@@ -115,6 +114,7 @@ fun AddPet(navBack: () -> Unit,
                 snackbarHostState.showSnackbar("¡Mascota agregada correctamente!")
                 viewModel.resetState()
             }
+
             error != null -> {
                 snackbarHostState.showSnackbar("Error: $error")
                 viewModel.resetState()
@@ -219,7 +219,10 @@ fun AddPet(navBack: () -> Unit,
                         colors = CardDefaults.cardColors(containerColor = Blanco),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
                             if (selectedImage != null) {
                                 AsyncImage(
                                     model = selectedImage,
@@ -246,11 +249,19 @@ fun AddPet(navBack: () -> Unit,
                     ) {
                         DropdownMenuItem(
                             text = { Text("Tomar foto") },
-                            leadingIcon = { Icon(Icons.Outlined.CameraAlt, contentDescription = null) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Outlined.CameraAlt,
+                                    contentDescription = null
+                                )
+                            },
                             onClick = {
                                 showImageMenu = false
                                 //pedir permiso
-                                val permissionCheckResult = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                                val permissionCheckResult = ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.CAMERA
+                                )
                                 if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
                                     cameraLauncher.launch()
                                 } else {
@@ -268,7 +279,12 @@ fun AddPet(navBack: () -> Unit,
                         )
                         DropdownMenuItem(
                             text = { Text("Elegir de galería") },
-                            leadingIcon = { Icon(Icons.Outlined.PhotoLibrary, contentDescription = null) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Outlined.PhotoLibrary,
+                                    contentDescription = null
+                                )
+                            },
                             onClick = {
                                 showImageMenu = false
                                 galleryLauncher.launch(
@@ -319,7 +335,7 @@ fun AddPet(navBack: () -> Unit,
                 Text(text = "Tipo: ", fontWeight = FontWeight.Medium, color = Negro)
                 Spacer(modifier = Modifier.height(8.dp))
                 PetType(
-                    onPetSelected = { 
+                    onPetSelected = {
                         petType = it
                         focusManager.clearFocus() // Al seleccionar tipo, cerramos teclado/foco
                     },
@@ -328,9 +344,11 @@ fun AddPet(navBack: () -> Unit,
             }
 
             // Fila de Edad y Peso
-            Row(modifier = Modifier
-                .padding(10.dp)
-                .fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth()
+            ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = "Edad: ", fontWeight = FontWeight.Medium, color = Negro)
                     Spacer(modifier = Modifier.height(8.dp))
@@ -372,7 +390,11 @@ fun AddPet(navBack: () -> Unit,
                                         }
                                 ) {
                                     //el texto se ve en base a la unidad seleccionada
-                                    Text(text = selectedUnit, color = Verde, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        text = selectedUnit,
+                                        color = Verde,
+                                        fontWeight = FontWeight.Bold
+                                    )
                                     Icon(
                                         imageVector = Icons.Default.ArrowDropDown,
                                         contentDescription = null,
@@ -383,7 +405,7 @@ fun AddPet(navBack: () -> Unit,
                             singleLine = true,
                             maxLines = 1
                         )
-                        
+
                         DropdownMenu(
                             //si es true se muestra el menu desplegable
                             expanded = isExpanded,
@@ -394,7 +416,7 @@ fun AddPet(navBack: () -> Unit,
                                 text = { Text("Kilogramos (kg)") },
                                 onClick = {
                                     selectedUnit = "kg"
-                                        //cuando selecciona se cierra
+                                    //cuando selecciona se cierra
                                     isExpanded = false
                                 },
                                 colors = MenuItemColors(

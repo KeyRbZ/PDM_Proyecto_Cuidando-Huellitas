@@ -13,42 +13,43 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class HistorialViewModel (
-        private val petInterface: PetInterface
-    ) : ViewModel() {
+class HistorialViewModel(
+    private val petInterface: PetInterface
+) : ViewModel() {
 
-        private val _pet = MutableStateFlow<Pet?>(null)
-        val pet = _pet.asStateFlow()
+    private val _pet = MutableStateFlow<Pet?>(null)
+    val pet = _pet.asStateFlow()
 
-        private val _error = MutableStateFlow<String?>(null)
-        val error = _error.asStateFlow()
+    private val _error = MutableStateFlow<String?>(null)
+    val error = _error.asStateFlow()
 
-        private val _isLoading = MutableStateFlow(false)
-        val isLoading = _isLoading.asStateFlow()
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
 
-        fun getPetDetails(petId: String) {
-            viewModelScope.launch {
-                _isLoading.value = true
-                _error.value = null
+    fun getPetDetails(petId: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
 
-                // Llamada al repositorio que devuelve un Result<Pet>
-                petInterface.getPetById(petId)
-                    .onSuccess { petFound ->
-                        _pet.value = petFound
-                        _isLoading.value = false
-                    }
-                    .onFailure { e ->
-                        _error.value = e.message ?: "Error al cargar los datos"
-                        _isLoading.value = false
-                    }
-            }
-        }
-        companion object {
-            val Factory = viewModelFactory {
-                initializer {
-                    val app = this[APPLICATION_KEY] as CuidandoHuellitasApplication
-                    Pet_Info_ViewModel(app.appProvider.providePetRepository())
+            // Llamada al repositorio que devuelve un Result<Pet>
+            petInterface.getPetById(petId)
+                .onSuccess { petFound ->
+                    _pet.value = petFound
+                    _isLoading.value = false
                 }
+                .onFailure { e ->
+                    _error.value = e.message ?: "Error al cargar los datos"
+                    _isLoading.value = false
+                }
+        }
+    }
+
+    companion object {
+        val Factory = viewModelFactory {
+            initializer {
+                val app = this[APPLICATION_KEY] as CuidandoHuellitasApplication
+                Pet_Info_ViewModel(app.appProvider.providePetRepository())
             }
         }
     }
+}

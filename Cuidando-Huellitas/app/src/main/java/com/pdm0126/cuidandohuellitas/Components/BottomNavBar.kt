@@ -1,19 +1,15 @@
 package com.pdm0126.cuidandohuellitas.Components
 
-import android.R.attr.onClick
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pdm0126.cuidandohuellitas.Navigation.Routes
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
@@ -62,7 +58,7 @@ fun BottomNavigationBar(
                     Icons.Default.DateRange,
                     contentDescription = "Recordatorio",
                     tint = NegroFocused
-                        //if (currentRoute is Routes.Recordatorio) Verde else NegroFocused
+                    //if (currentRoute is Routes.Recordatorio) Verde else NegroFocused
                 )
             },
             colors = NavigationBarItemDefaults.colors(
@@ -82,7 +78,7 @@ fun BottomNavigationBar(
                     Icons.Default.Lightbulb,
                     contentDescription = "Consejos",
                     tint =
-                    if (currentRoute is Routes.Tips) Verde else NegroFocused
+                        if (currentRoute is Routes.Tips) Verde else NegroFocused
                 )
             },
             colors = NavigationBarItemDefaults.colors(
@@ -101,7 +97,7 @@ fun BottomNavigationBar(
                 Icon(
                     Icons.Default.Person,
                     contentDescription = "Perfil",
-                    tint = if (currentRoute is Routes.MainScreen) Verde else NegroFocused
+                    tint = if (currentRoute is Routes.Profile) Verde else NegroFocused
                 )
             },
             colors = NavigationBarItemDefaults.colors(

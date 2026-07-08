@@ -30,28 +30,28 @@ class AddPetViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-        fun addPet(
-            name: String,
-            type: String,
-            age: String,
-            weight: String,
-            photoUri: Uri?
-        ) {
-            viewModelScope.launch {
-                _error.value = null
-                _isLoading.value = true
-                petInterface.addPet(photoUri, name, type, age, weight)
-                    .onSuccess {
-                        _isLoading.value = false
-                        _guardadoExitoso.value = true
-                        petInterface.syncPets()
-                    }
-                    .onFailure { e ->
-                        _isLoading.value = false
-                        _error.value = e.message
-                    }
-            }
+    fun addPet(
+        name: String,
+        type: String,
+        age: String,
+        weight: String,
+        photoUri: Uri?
+    ) {
+        viewModelScope.launch {
+            _error.value = null
+            _isLoading.value = true
+            petInterface.addPet(photoUri, name, type, age, weight)
+                .onSuccess {
+                    _isLoading.value = false
+                    _guardadoExitoso.value = true
+                    petInterface.syncPets()
+                }
+                .onFailure { e ->
+                    _isLoading.value = false
+                    _error.value = e.message
+                }
         }
+    }
 
 
     fun resetState() {

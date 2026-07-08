@@ -15,7 +15,6 @@ import com.pdm0126.cuidandohuellitas.Data.remote.firebase.storage.StorageDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
-import kotlinx.coroutines.flow.first
 
 class PetsRepositoryImpl(
     private val petsDao: PetsDao,
@@ -59,7 +58,10 @@ class PetsRepositoryImpl(
 
             petsFirestoreDao.addPet(newPet)
             petsDao.addPet(newPet.toEntity())
-            Log.d("FirebaseSuccess", "Mascota enviada correctamente a Firestore con ID de usuario: $userId")
+            Log.d(
+                "FirebaseSuccess",
+                "Mascota enviada correctamente a Firestore con ID de usuario: $userId"
+            )
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e("FirebaseError", "Error al añadir mascota: ${e.message}", e)
@@ -82,6 +84,7 @@ class PetsRepositoryImpl(
             Result.failure(e)
         }
     }
+
     override suspend fun deletePet(petId: String): Result<Unit> {
         return try {
             val userId = getCurrentUserId()

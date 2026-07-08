@@ -1,4 +1,5 @@
 package com.pdm0126.cuidandohuellitas.Data.repository
+
 data class ProfileData(
     val name: String = "",
     val email: String = "",

@@ -33,9 +33,8 @@ fun Cuidando_Huellitas_App(){
                     navToPetInfo = { petId -> backStack.add(Routes.PetInfo(petId = petId)) },
                     navToAddPet = { backStack.add(Routes.AddPet) },
                     //navToReminders = { backStack.add(Routes.Reminders) },
-                    //navToTips = { backStack.add(Routes.Tips) },
-                    navToProfile = { backStack.add(Routes.Profile) }
-                    navToTips = { backStack.add(Routes.Tips) },
+                    navToProfile = { backStack.add(Routes.Profile) },
+                    navToTips = { backStack.add(Routes.Tips) }
                     //navToProfile = { backStack.add(Routes.Profile) }
                 )
             }
@@ -70,7 +69,10 @@ fun Cuidando_Huellitas_App(){
                     petId = "",
                     navToHome = {
                         backStack.add(Routes.MainScreen)
-                    }
+                    },
+                    navToProfile = { backStack.add(Routes.Profile) },
+                    navToTips = { backStack.add(Routes.Tips) },
+                    navToVaccacines = {}
                 )
             }
             entry<Routes.Splash> {
@@ -104,6 +106,7 @@ fun Cuidando_Huellitas_App(){
             entry<Routes.Profile>{
                 ProfileScreen(
                     currentRoute = currentRoute as Routes,
+                    navToTips = {backStack.add(Routes.Tips)},
                     navToHome = { backStack.add(Routes.MainScreen) }
                 )
             }
@@ -112,7 +115,7 @@ fun Cuidando_Huellitas_App(){
                     currentRoute = currentRoute as Routes,
                     navToHome = { backStack.add(Routes.MainScreen) },
                     //navToReminders = {},
-                    //navToProfile = {}
+                    navToProfile = {backStack.add(Routes.Profile)}
                 )
             }
 

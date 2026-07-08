@@ -1,5 +1,3 @@
-// C:/Users/Sandra Garcia/Desktop/PDM_Proyecto_Cuidando-Huellitas/Cuidando-Huellitas/app/src/main/java/com/pdm0126/cuidandohuellitas/Data/remote/firebase/Pet/PetFirestoreDao.kt
-
 package com.pdm0126.cuidandohuellitas.Data.remote.firebase.Pet
 
 import com.google.firebase.Firebase

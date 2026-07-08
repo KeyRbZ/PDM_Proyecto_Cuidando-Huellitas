@@ -25,11 +25,14 @@ fun AlertDialogDelete(
             Icon(icon, contentDescription = "Icon")
         },
         title = {
-            Text(text = dialogTitle,
-                color = Negro)
+            Text(
+                text = dialogTitle,
+                color = Negro
+            )
         },
         text = {
-            Text(text = dialogText,
+            Text(
+                text = dialogText,
                 color = NegroFocused
             )
         },
@@ -64,5 +67,5 @@ fun AlertDialogDelete(
         textContentColor = Negro,
         iconContentColor = Verde,
 
-    )
+        )
 }

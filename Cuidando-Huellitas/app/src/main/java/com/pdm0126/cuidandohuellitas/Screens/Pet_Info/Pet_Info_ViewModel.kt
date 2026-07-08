@@ -32,7 +32,7 @@ class Pet_Info_ViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
-            
+
             // Llamada al repositorio que devuelve un Result<Pet>
             petInterface.getPetById(petId)
                 .onSuccess { petFound ->
@@ -63,10 +63,12 @@ class Pet_Info_ViewModel(
                 }
         }
     }
+
     fun resetState() {
         _guardadoExitoso.value = null
         _error.value = null
     }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
