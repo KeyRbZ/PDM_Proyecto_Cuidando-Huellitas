@@ -15,6 +15,7 @@ import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
 @Composable
 fun Cuidando_Huellitas_App(){
     val backStack = rememberNavBackStack(Routes.MainScreen)
+    val currentRoute = backStack.last()
 
     NavDisplay(
         backStack = backStack,
@@ -22,16 +23,18 @@ fun Cuidando_Huellitas_App(){
         entryProvider = entryProvider {
             entry<Routes.MainScreen> {
                 MainScreen(
-                    navToPetInfo = { petId ->  //petId llega del callback
-                        backStack.add(Routes.PetInfo(petId = petId))
-                    },
-                    navToAddPet = { backStack.add(Routes.AddPet) }
+                    currentRoute = currentRoute as Routes,
+                    navToPetInfo = { petId -> backStack.add(Routes.PetInfo(petId = petId)) },
+                    navToAddPet = { backStack.add(Routes.AddPet) },
+                    //navToReminders = { backStack.add(Routes.Reminders) },
+                    //navToTips = { backStack.add(Routes.Tips) },
+                    //navToProfile = { backStack.add(Routes.Profile) }
                 )
             }
             entry<Routes.PetInfo> { key ->
                 Pet_Info(
                     navBack = { backStack.removeLastOrNull() },
-                    navToHistorial = { backStack.add(Routes.Recordatorio) },
+                    navToHistorial = { backStack.add(Routes.Historial) },
                     petId = key.petId
                 )
             }
@@ -40,10 +43,11 @@ fun Cuidando_Huellitas_App(){
                     navBack = { backStack.removeLastOrNull() }
                 )
             }
-            entry<Routes.Recordatorio> { key ->
+            entry<Routes.Historial> { key ->
                 HistorialScreen(
+                    currentRoute = currentRoute as Routes,
                     navBack = { backStack.removeLastOrNull() },
-                    userId = "",
+                    petId = "",
                     navToHome = {
                         backStack.add(Routes.MainScreen)
                     }

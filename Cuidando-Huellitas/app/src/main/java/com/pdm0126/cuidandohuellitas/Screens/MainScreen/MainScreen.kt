@@ -53,6 +53,7 @@ import androidx.compose.runtime.remember
 import com.pdm0126.cuidandohuellitas.Components.BottomNavigationBar
 import com.pdm0126.cuidandohuellitas.Components.LoadingScreen
 import com.pdm0126.cuidandohuellitas.Components.PullToRefresh
+import com.pdm0126.cuidandohuellitas.Navigation.Routes
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
 import com.pdm0126.cuidandohuellitas.ui.theme.Celeste
 import com.pdm0126.cuidandohuellitas.ui.theme.Verde
@@ -60,9 +61,11 @@ import com.pdm0126.cuidandohuellitas.utils.ImageUtils.base64ToBitmap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navToPetInfo: (String) -> Unit,
-               navToAddPet: () -> Unit,
-               viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory)) {
+fun MainScreen(
+    currentRoute: Routes,
+    navToPetInfo: (String) -> Unit,
+    navToAddPet: () -> Unit,
+    viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory)) {
     val pets by viewModel.pets.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -89,6 +92,7 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
         },
         bottomBar = {
             BottomNavigationBar(
+                currentRoute = currentRoute as Routes,
                 navToHome = {},
                 navToReminders = {},
                 navToTips = {},
@@ -115,7 +119,8 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
         PullToRefresh(
             isRefreshing = isRefreshing,
             onRefresh = { viewModel.refreshPets() },
-            paddingValues = innerPadding
+            //paddingValues = innerPadding,
+            //modifier = Modifier.background(Color.Gray)
         ) {
             if(error!=null){
                 Column(
@@ -127,6 +132,7 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
                     verticalArrangement = Arrangement.Center) {
                         Text(
                             text = "$error"
+
                         )
                         Button(onClick = { viewModel.getPets() }) {
                             Text(
@@ -136,7 +142,11 @@ fun MainScreen(navToPetInfo: (String) -> Unit,
                         }
                     }
             }else{
-                Column(Modifier.padding(innerPadding).fillMaxSize().padding(15.dp)) {
+                Column(Modifier.padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    ) {
+
                     Text("Mis Mascotas",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.ExtraBold,

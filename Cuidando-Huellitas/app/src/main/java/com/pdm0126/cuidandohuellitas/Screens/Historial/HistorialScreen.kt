@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pdm0126.cuidandohuellitas.Components.BottomNavigationBar
+import com.pdm0126.cuidandohuellitas.Navigation.Routes
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
 import com.pdm0126.cuidandohuellitas.ui.theme.BordeTextField
 import com.pdm0126.cuidandohuellitas.ui.theme.Celeste
@@ -46,16 +47,18 @@ import com.pdm0126.cuidandohuellitas.utils.ImageUtils.base64ToBitmap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistorialScreen(navBack: () -> Unit,
-                    userId: String,
+fun HistorialScreen(
+    currentRoute: Routes,
+    navBack: () -> Unit,
+                    petId: String,
                     navToHome: () -> Unit,
                    // viewModel: HistorialViewModel = viewModel(factory = HistorialViewModel.Factory)
     ) {
 
     //val pet by viewModel.pet.collectAsState()
 
-    LaunchedEffect(userId) {
-        //viewModel.getHistorial(userId)
+    LaunchedEffect(petId) {
+        //viewModel.getHistorial(petId)
     }
     Scaffold(
         topBar = {
@@ -77,6 +80,7 @@ fun HistorialScreen(navBack: () -> Unit,
         },
         bottomBar = {
             BottomNavigationBar(
+                currentRoute = currentRoute as Routes,
                 navToHome = { navToHome() },
                 navToReminders = {},
                 navToTips = {},

@@ -14,5 +14,5 @@ sealed class Routes: NavKey {
     @Serializable
     data object MainScreen : Routes()
     @Serializable
-    data object Recordatorio : Routes()
+    data object Historial : Routes()
 }

@@ -43,6 +43,7 @@ class AddPetViewModel(
                 .onSuccess {
                     _cargando.value = false
                     _guardadoExitoso.value = true
+                    petInterface.syncPets()
                 }
                 .onFailure { e ->
                     _cargando.value = false
