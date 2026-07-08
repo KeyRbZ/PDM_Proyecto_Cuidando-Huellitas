@@ -26,7 +26,7 @@ fun App() {
                 LoginScreen(
                     onLoginSuccess = {
                         backStack.removeLastOrNull()
-                        backStack.add(Routes.Home)
+                        backStack.add(Routes.MainScreen)
                     },
                     onGoToRegister = { backStack.add(Routes.Register) },
                     onGoToRecovery = { backStack.add(Routes.Recovery) }
@@ -36,13 +36,16 @@ fun App() {
                 RegisterScreen(
                     onRegisterSuccess = {
                         backStack.removeLastOrNull()
-                        backStack.add(Routes.Home)
+                        backStack.add(Routes.MainScreen)
                     },
                     onGoToLogin = { backStack.removeLastOrNull() }
                 )
             }
             entry<Routes.Recovery> {
                 RecoveryScreen(onGoToLogin = { backStack.removeLastOrNull() })
+            }
+            entry<Routes.MainScreen> {
+                androidx.compose.material3.Text("Login Exitoso")
             }
         }
     )

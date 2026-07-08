@@ -8,5 +8,5 @@ sealed class Routes : NavKey {
     @Serializable data object Login : Routes()
     @Serializable data object Register : Routes()
     @Serializable data object Recovery : Routes()
-    @Serializable data object Home : Routes()
+    @Serializable data object MainScreen : Routes()
 }

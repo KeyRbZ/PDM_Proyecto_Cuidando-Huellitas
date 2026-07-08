@@ -72,7 +72,6 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
     fun onPasswordChange(value: String) = _state.update { it.copy(password = value, errorMessage = null) }
     fun onConfirmPasswordChange(value: String) = _state.update { it.copy(confirmPassword = value, errorMessage = null) }
 
-    // Recibe el avatar ya resuelto: el emoji elegido, o la foto convertida a texto (Base64)
     fun onRegisterClick(avatarValue: String) {
         val current = _state.value
         if (current.name.isBlank() || current.email.isBlank() || current.password.isBlank()) {
@@ -97,7 +96,6 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
                         try {
                             UsersFirestoreDao().saveUser(uid, current.name, avatarValue, current.email)
                         } catch (e: Exception) {
-                            // Si falla guardar en Firestore, no bloqueamos el registro del usuario
                         }
                     }
                     _state.update { it.copy(isLoading = false, isRegisterSuccess = true) }
@@ -123,7 +121,6 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
     }
 }
 
-// Convierte una foto real (Bitmap) a texto Base64, mismo patrón usado en Add-Pet
 private fun bitmapToBase64(bitmap: Bitmap): String {
     val resized = Bitmap.createScaledBitmap(bitmap, 200, 200, true)
     val stream = ByteArrayOutputStream()
@@ -144,7 +141,6 @@ fun RegisterScreen(
     val avatars = listOf("🐶", "🐱", "🐰", "🐦", "🐹", "🐟")
     var selectedAvatarIndex by remember { mutableStateOf(0) }
 
-    // Si el usuario elige foto real, esto tiene prioridad sobre el emoji
     var selectedImage by remember { mutableStateOf<Any?>(null) }
     var showImageMenu by remember { mutableStateOf(false) }
 
@@ -201,7 +197,6 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(20.dp))
 
-            // Círculo grande: muestra la foto real si existe, si no el emoji seleccionado
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -234,7 +229,6 @@ fun RegisterScreen(
             Text("Selecciona tu avatar o sube tu foto", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
-            // Fila de opciones: avatares predeterminados + opción de cámara/galería al final
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -256,7 +250,7 @@ fun RegisterScreen(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.clickable {
                                 selectedAvatarIndex = index
-                                selectedImage = null // al elegir emoji, se descarta la foto
+                                selectedImage = null
                             }
                         ) {
                             Text(avatar, fontSize = 24.sp)
@@ -264,7 +258,6 @@ fun RegisterScreen(
                     }
                 }
 
-                // Última opción: ícono de cámara para tomar foto o elegir de galería
                 item {
                     Box {
                         Surface(
@@ -411,8 +404,6 @@ fun RegisterScreen(
             } else {
                 Button(
                     onClick = {
-                        // Se resuelve aquí, al momento de registrar, cuál avatar mandar:
-                        // la foto convertida a texto (Base64), o el emoji elegido.
                         val avatarValue: String = when (val image = selectedImage) {
                             is Uri -> {
                                 val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, image)
