@@ -8,7 +8,7 @@ sealed class Routes: NavKey {
     @Serializable
     data object AddPet : Routes()
     @Serializable
-    data object PetType : Routes()
+    data object PetTips : Routes()
     @Serializable
     data class PetInfo(val petId: String) : Routes()
     @Serializable
@@ -25,4 +25,7 @@ sealed class Routes: NavKey {
     data object Recovery : Routes()
     @Serializable
     data object Home : Routes()
+    data object Recordatorio : Routes()
+    @Serializable
+    data object Profile : Routes()
 }

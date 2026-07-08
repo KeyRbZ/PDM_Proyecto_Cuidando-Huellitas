@@ -15,6 +15,7 @@ import com.pdm0126.cuidandohuellitas.Data.remote.firebase.storage.StorageDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
+import kotlinx.coroutines.flow.first
 
 class PetsRepositoryImpl(
     private val petsDao: PetsDao,
@@ -111,7 +112,7 @@ class PetsRepositoryImpl(
 
             //Re-poblar la base de datos local con lo que hay en Firestore
             remotePets.forEach { petsDao.addPet(it.toEntity()) }
-            
+
             Log.d("FirebaseSync", "Sincronización completada con éxito")
             Result.success(Unit)
         } catch (e: Exception) {

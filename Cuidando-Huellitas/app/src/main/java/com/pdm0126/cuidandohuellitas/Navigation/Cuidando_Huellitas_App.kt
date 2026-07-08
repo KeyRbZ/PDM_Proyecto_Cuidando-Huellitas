@@ -10,6 +10,7 @@ import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
 import com.pdm0126.cuidandohuellitas.Screens.Historial.HistorialScreen
 import com.pdm0126.cuidandohuellitas.Screens.MainScreen.MainScreen
 import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
+import com.pdm0126.cuidandohuellitas.Screens.Profile.ProfileScreen
 import com.pdm0126.cuidandohuellitas.ui.LoginScreen
 import com.pdm0126.cuidandohuellitas.ui.RecoveryScreen
 import com.pdm0126.cuidandohuellitas.ui.RegisterScreen
@@ -32,7 +33,7 @@ fun Cuidando_Huellitas_App(){
                     navToAddPet = { backStack.add(Routes.AddPet) },
                     //navToReminders = { backStack.add(Routes.Reminders) },
                     //navToTips = { backStack.add(Routes.Tips) },
-                    //navToProfile = { backStack.add(Routes.Profile) }
+                    navToProfile = { backStack.add(Routes.Profile) }
                 )
             }
             entry<Routes.PetInfo> { key ->
@@ -42,6 +43,14 @@ fun Cuidando_Huellitas_App(){
                     navToHistorial = { backStack.add(Routes.Historial) },
                     petId = key.petId
                 )
+            }
+            entry<Routes.PetTips> {
+//                PetTipsScreen(
+//                    navBack = { backStack.removeLastOrNull() },
+//                    navToHome = {
+//                        backStack.add(Routes.MainScreen)
+//                    }
+//                )
             }
             entry<Routes.AddPet> { key ->
                 AddPet(
@@ -88,6 +97,12 @@ fun Cuidando_Huellitas_App(){
             }
             entry<Routes.Recovery> {
                 RecoveryScreen(onGoToLogin = { backStack.removeLastOrNull() })
+            }
+            entry<Routes.Profile>{
+                ProfileScreen(
+                    currentRoute = currentRoute as Routes,
+                    navToHome = { backStack.add(Routes.MainScreen) }
+                )
             }
 
         }

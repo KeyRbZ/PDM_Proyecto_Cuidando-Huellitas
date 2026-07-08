@@ -15,11 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -27,8 +22,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -49,7 +42,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Button
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.runtime.remember
 import com.pdm0126.cuidandohuellitas.Components.BottomNavigationBar
 import com.pdm0126.cuidandohuellitas.Components.LoadingScreen
 import com.pdm0126.cuidandohuellitas.Components.PullToRefresh
@@ -66,7 +58,9 @@ fun MainScreen(
     currentRoute: Routes,
     navToPetInfo: (String) -> Unit,
     navToAddPet: () -> Unit,
-    viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory)) {
+    viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory),
+    navToProfile: () -> Unit)
+   {
     val pets by viewModel.pets.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -97,7 +91,7 @@ fun MainScreen(
                 navToHome = {},
                 navToReminders = {},
                 navToTips = {},
-                navToProfile = {}
+                navToProfile = {navToProfile()}
             )
         }
         ,
@@ -123,7 +117,7 @@ fun MainScreen(
             //paddingValues = innerPadding,
             //modifier = Modifier.background(Color.Gray)
         ) {
-            if(error!=null){
+            if(error != null){
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -210,7 +204,6 @@ fun MainScreen(
                             }
                         }
                     }
-
                 }
             }
         }

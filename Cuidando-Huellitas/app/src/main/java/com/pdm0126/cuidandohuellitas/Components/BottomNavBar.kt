@@ -96,15 +96,13 @@ fun BottomNavigationBar(
         )
 
         NavigationBarItem(
-            selected = false,
-            //currentRoute is Routes.Profile,
+            selected = currentRoute is Routes.Profile,
             onClick = { navToProfile() },
             icon = {
                 Icon(
                     Icons.Default.Person,
                     contentDescription = "Perfil",
-                    tint = NegroFocused
-                    //if (currentRoute is Routes.MainScreen) Verde else NegroFocused
+                    tint = if (currentRoute is Routes.MainScreen) Verde else NegroFocused
                 )
             },
             colors = NavigationBarItemDefaults.colors(
