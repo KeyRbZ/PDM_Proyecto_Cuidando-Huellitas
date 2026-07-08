@@ -51,14 +51,4 @@ class PetsFirestoreDao {
                 )
             }
     }
-
-    suspend fun getPetsByUser(): List<PetEntity> {
-        val userId = auth.currentUser?.uid ?: tempUserId
-
-        return db.collection("pets")
-            .whereEqualTo("userId", userId)
-            .get()
-            .await()
-            .toObjects(PetEntity::class.java)
-    }
 }

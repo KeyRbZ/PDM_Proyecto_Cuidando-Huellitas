@@ -14,7 +14,7 @@ data class Pet(
     val weight: String = ""
 )
 
-fun Pet.toEntity() : PetEntity{
+/*fun Pet.toEntity() : PetEntity{
     return PetEntity(
         id = id,
         userId = userId,
@@ -36,4 +36,4 @@ fun PetEntity.toModel(): Pet{
         age = age,
         weight = weight,
     )
-}
+}*/
