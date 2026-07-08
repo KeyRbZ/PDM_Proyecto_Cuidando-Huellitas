@@ -75,6 +75,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.pdm0126.cuidandohuellitas.Components.DatePickerDocked
 import com.pdm0126.cuidandohuellitas.Components.DatePickerFieldToModal
+import com.pdm0126.cuidandohuellitas.Components.LoadingScreen
 import com.pdm0126.cuidandohuellitas.Components.PetType
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
 import com.pdm0126.cuidandohuellitas.ui.theme.BlancoFocused
@@ -91,12 +92,19 @@ import com.pdm0126.cuidandohuellitas.utils.ImageUtils.bitmapToUri
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPet(navBack: () -> Unit,
+           navToHome: () -> Unit,
            viewModel: AddPetViewModel = viewModel(factory = AddPetViewModel.Factory)) {
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val guardadoExitoso by viewModel.guardadoExitoso.collectAsState()
     val error by viewModel.error.collectAsState()
+    val loading by viewModel.isLoading.collectAsState()
+
+    if (loading){
+        LoadingScreen()
+        return
+    }
 
 // Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
@@ -454,6 +462,8 @@ fun AddPet(navBack: () -> Unit,
                         weight = "$petWeight $selectedUnit",
                         photoUri = photoUri
                     )
+
+                    navToHome()
                 },
                 modifier = Modifier
                     .fillMaxWidth()

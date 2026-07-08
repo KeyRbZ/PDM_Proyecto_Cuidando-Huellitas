@@ -40,7 +40,10 @@ fun Cuidando_Huellitas_App(){
             }
             entry<Routes.AddPet> { key ->
                 AddPet(
-                    navBack = { backStack.removeLastOrNull() }
+                    navBack = { backStack.removeLastOrNull() },
+                    navToHome = {
+                        backStack.add(Routes.MainScreen)
+                    }
                 )
             }
             entry<Routes.Historial> { key ->
