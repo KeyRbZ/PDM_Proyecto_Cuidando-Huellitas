@@ -1,14 +1,19 @@
 package com.pdm0126.cuidandohuellitas
 
+import android.app.Application
 import androidx.room.Room
 import com.pdm0126.cuidandohuellitas.Data.AppProvider
 import com.pdm0126.cuidandohuellitas.Data.database.AppDatabase
-import okhttp3.internal.platform.PlatformRegistry.applicationContext
-import android.app.Application
+import com.pdm0126.cuidandohuellitas.data.auth.AuthRepository
+import com.pdm0126.cuidandohuellitas.data.auth.AuthRepositoryImpl
 
 class CuidandoHuellitasApplication : Application() {
     lateinit var appProvider: AppProvider
 
+    // Repositorio de autenticación traído de la rama auth-screens
+    val authRepository: AuthRepository by lazy { AuthRepositoryImpl() }
+
+    // Base de datos de Room de la rama profile
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,

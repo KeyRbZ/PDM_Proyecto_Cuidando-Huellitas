@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,9 +40,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.pdm0126.cuidandohuellitas.Components.BottomNavigationBar
-import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
-import com.pdm0126.cuidandohuellitas.ui.theme.Celeste
-import com.pdm0126.cuidandohuellitas.ui.theme.Verde
 import java.io.ByteArrayOutputStream
 
 private val avatarOptions = listOf("🐶", "🐱", "🐰", "🐦", "🐹", "🐟")
@@ -63,10 +61,10 @@ private fun decodeAvatarBitmap(avatar: String): Bitmap? {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navToHome: () -> Unit,
+    onLogOut: () -> Unit,
     viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
 ) {
     val context = LocalContext.current
@@ -90,24 +88,18 @@ fun ProfileScreen(
     ) { isGranted -> if (isGranted) cameraLauncher.launch() }
 
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Mi Perfil", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Blanco) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Verde)
-            )
-        },
         bottomBar = {
             BottomNavigationBar(
+                selectedIndex = 3,
                 navToHome = { navToHome() },
                 navToReminders = {},
                 navToTips = {},
                 navToProfile = {}
             )
-        },
-        containerColor = Celeste
-    ) { innerPadding ->
+        }
+    ) { padding ->
         if (isLoading) {
-            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
             return@Scaffold
@@ -116,17 +108,19 @@ fun ProfileScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 20.dp),
+                .padding(padding)
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
+            // Avatar tocable para editar
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(90.dp)
                     .clip(CircleShape)
-                    .border(1.dp, Verde, CircleShape)
+                    .background(Color.LightGray)
+                    .border(1.dp, Color.Gray, CircleShape)
                     .clickable { editingAvatar = !editingAvatar },
                 contentAlignment = Alignment.Center
             ) {
@@ -147,18 +141,22 @@ fun ProfileScreen(
                             contentScale = ContentScale.Crop
                         )
                     } else {
-                        Text(text = if (profile.avatar.isNotEmpty()) profile.avatar else "🐾", fontSize = 44.sp)
+                        Text(
+                            text = if (profile.avatar.isNotEmpty()) profile.avatar else "🐾",
+                            fontSize = 40.sp
+                        )
                     }
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
-            Text("Toca para cambiar", fontSize = 12.sp, color = Verde)
+            Spacer(Modifier.height(4.dp))
+            Text("Toca para cambiar", fontSize = 11.sp, color = Color.Gray)
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             Text(profile.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             Text("Amante de mascotas 🐾", color = Color.Gray)
 
+            // Selector de avatar/foto
             if (editingAvatar) {
                 Spacer(Modifier.height(16.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -166,8 +164,8 @@ fun ProfileScreen(
                         Surface(
                             modifier = Modifier.size(44.dp),
                             shape = CircleShape,
-                            color = Blanco,
-                            border = BorderStroke(1.dp, Verde)
+                            color = Color.White,
+                            border = BorderStroke(1.dp, Color.Gray)
                         ) {
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -186,14 +184,14 @@ fun ProfileScreen(
                             Surface(
                                 modifier = Modifier.size(44.dp),
                                 shape = CircleShape,
-                                color = Blanco,
-                                border = BorderStroke(1.dp, Verde)
+                                color = Color.White,
+                                border = BorderStroke(1.dp, Color.Gray)
                             ) {
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier.clickable { showImageMenu = true }
                                 ) {
-                                    Icon(Icons.Outlined.CameraAlt, contentDescription = "Foto", tint = Verde, modifier = Modifier.size(20.dp))
+                                    Icon(Icons.Outlined.CameraAlt, contentDescription = "Foto", modifier = Modifier.size(20.dp))
                                 }
                             }
                             DropdownMenu(expanded = showImageMenu, onDismissRequest = { showImageMenu = false }) {
@@ -221,37 +219,30 @@ fun ProfileScreen(
 
                 if (pendingImage != null) {
                     Spacer(Modifier.height(12.dp))
-                    Button(
-                        onClick = {
-                            val avatarValue: String = when (val image = pendingImage) {
-                                is Uri -> bitmapToBase64(MediaStore.Images.Media.getBitmap(context.contentResolver, image))
-                                is Bitmap -> bitmapToBase64(image)
-                                else -> profile.avatar
-                            }
-                            viewModel.updateAvatar(avatarValue)
-                            pendingImage = null
-                            editingAvatar = false
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Verde)
-                    ) {
-                        Text("Guardar nueva foto", color = Blanco)
+                    Button(onClick = {
+                        val avatarValue: String = when (val image = pendingImage) {
+                            is Uri -> bitmapToBase64(MediaStore.Images.Media.getBitmap(context.contentResolver, image))
+                            is Bitmap -> bitmapToBase64(image)
+                            else -> profile.avatar
+                        }
+                        viewModel.updateAvatar(avatarValue)
+                        pendingImage = null
+                        editingAvatar = false
+                    }) {
+                        Text("Guardar nueva foto")
                     }
                 }
             }
 
             Spacer(Modifier.height(24.dp))
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Blanco)
-            ) {
+            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Información Personal", fontWeight = FontWeight.Bold, color = Verde)
-                    Spacer(Modifier.height(12.dp))
+                    Text("Información Personal", fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(8.dp))
                     Text("Nombre", fontSize = 12.sp, color = Color.Gray)
                     Text(profile.name)
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(8.dp))
                     Text("Correo", fontSize = 12.sp, color = Color.Gray)
                     Text(profile.email)
                 }
@@ -259,31 +250,38 @@ fun ProfileScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Blanco)
-            ) {
+            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Estadísticas", fontWeight = FontWeight.Bold, color = Verde)
-                    Spacer(Modifier.height(12.dp))
+                    Text("Estadísticas", fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        StatItem(number = profile.totalMascotas.toString(), label = "Mascotas")
-                        StatItem(number = "0", label = "Vacunas")
-                        StatItem(number = "0", label = "Pendientes")
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(profile.totalMascotas.toString(), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                            Text("Mascotas", fontSize = 12.sp, color = Color.Gray)
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("0", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                            Text("Vacunas", fontSize = 12.sp, color = Color.Gray)
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("0", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                            Text("Pendientes", fontSize = 12.sp, color = Color.Gray)
+                        }
                     }
                 }
             }
 
             Spacer(Modifier.height(24.dp))
-        }
-    }
-}
 
-@Composable
-private fun StatItem(number: String, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(number, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Verde)
-        Text(label, fontSize = 12.sp, color = Color.Gray)
+            Button(
+                onClick = { onLogOut() },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                modifier = Modifier.fillMaxWidth().height(50.dp)
+            ) {
+                Text("Cerrar Sesión", color = Color.White)
+            }
+
+            Spacer(Modifier.height(16.dp))
+        }
     }
 }
