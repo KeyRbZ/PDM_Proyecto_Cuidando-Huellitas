@@ -19,14 +19,14 @@ import com.pdm0126.cuidandohuellitas.ui.theme.Verde
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoadingScreen() {
+fun LoadingScreen(title: String) {
     Scaffold(
         containerColor = Blanco,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Cuidando Huellitas",
+                        title,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Blanco

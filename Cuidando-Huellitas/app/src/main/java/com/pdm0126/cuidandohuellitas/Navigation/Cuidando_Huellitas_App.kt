@@ -10,6 +10,7 @@ import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
 import com.pdm0126.cuidandohuellitas.Screens.Historial.HistorialScreen
 import com.pdm0126.cuidandohuellitas.Screens.MainScreen.MainScreen
 import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
+import com.pdm0126.cuidandohuellitas.Screens.TipScreen.TipScreen
 
 
 @Composable
@@ -27,7 +28,7 @@ fun Cuidando_Huellitas_App(){
                     navToPetInfo = { petId -> backStack.add(Routes.PetInfo(petId = petId)) },
                     navToAddPet = { backStack.add(Routes.AddPet) },
                     //navToReminders = { backStack.add(Routes.Reminders) },
-                    //navToTips = { backStack.add(Routes.Tips) },
+                    navToTips = { backStack.add(Routes.Tips) },
                     //navToProfile = { backStack.add(Routes.Profile) }
                 )
             }
@@ -51,6 +52,14 @@ fun Cuidando_Huellitas_App(){
                     navToHome = {
                         backStack.add(Routes.MainScreen)
                     }
+                )
+            }
+            entry<Routes.Tips> {key ->
+                TipScreen(
+                    currentRoute = currentRoute as Routes,
+                    navToHome = { backStack.add(Routes.MainScreen) },
+                    //navToReminders = {},
+                    //navToProfile = {}
                 )
             }
 

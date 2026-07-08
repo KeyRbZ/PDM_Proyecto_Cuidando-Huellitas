@@ -30,12 +30,12 @@ class TipViewModel: ViewModel() {
 
     fun getTips(){
         viewModelScope.launch {
-            _loading.value = true
+            _loading.value = false
             _error.value = null
             tipsRepository.getTips().onSuccess { list ->
                 _tips.value = list
-            }.onFailure {
-                _error.value = "Hola corazon bello, parece que hay un error, vuelve a intentarlo porfavor"
+            }.onFailure { e ->
+                _error.value = "Hola corazon bello, parece que hay un error, vuelve a intentarlo porfavor pero tu error es $e"
             }
             _loading.value = false
         }

@@ -65,6 +65,7 @@ fun MainScreen(
     currentRoute: Routes,
     navToPetInfo: (String) -> Unit,
     navToAddPet: () -> Unit,
+    navToTips:()->Unit,
     viewModel: MainScreenViewModel = viewModel(factory = MainScreenViewModel.Factory)) {
     val pets by viewModel.pets.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
@@ -72,7 +73,7 @@ fun MainScreen(
     val error by viewModel.error.collectAsState()
 
     if (loading){
-        LoadingScreen()
+        LoadingScreen("Cuidando Huellitas")
         return
     }
 
@@ -95,7 +96,7 @@ fun MainScreen(
                 currentRoute = currentRoute as Routes,
                 navToHome = {},
                 navToReminders = {},
-                navToTips = {},
+                navToTips = {navToTips()},
                 navToProfile = {}
             )
         }

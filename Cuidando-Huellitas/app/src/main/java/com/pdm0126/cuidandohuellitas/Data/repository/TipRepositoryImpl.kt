@@ -10,7 +10,7 @@ import io.ktor.client.request.get
 class TipRepositoryImpl: TipRepository {
     override suspend fun getTips(): Result<List<Tip>> {
         try{
-            val response: List<TipsDto> = KtorClient.client.get { "Consejos" }.body()
+            val response: List<TipsDto> = KtorClient.client.get("Consejos").body()
             return Result.success(response.map{resDTO -> resDTO.toModel()})
         }catch(e: Exception){
             return Result.failure(e)

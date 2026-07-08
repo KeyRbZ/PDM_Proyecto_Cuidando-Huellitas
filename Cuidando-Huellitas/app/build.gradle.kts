@@ -18,7 +18,7 @@ if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
 }
 
-val apiToken = localProperties.getProperty("TOKEN") ?: ""
+val apiKey = localProperties.getProperty("ApiKey") ?: ""
 
 android {
     namespace = "com.pdm0126.cuidandohuellitas"
@@ -36,7 +36,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_TOKEN", "\"$apiToken\"")
+        buildConfigField("String", "API_Key", "\"$apiKey\"")
     }
     buildFeatures {
         buildConfig = true
