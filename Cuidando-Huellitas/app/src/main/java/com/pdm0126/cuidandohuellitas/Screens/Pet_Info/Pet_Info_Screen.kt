@@ -9,40 +9,37 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator // NUEVO
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect // NUEVO
-import androidx.compose.runtime.collectAsState // NUEVO
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,8 +51,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel // NUEVO
-import coil3.compose.AsyncImage
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pdm0126.cuidandohuellitas.Components.AlertDialogDelete
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
 import com.pdm0126.cuidandohuellitas.ui.theme.BlancoFocused
 import com.pdm0126.cuidandohuellitas.ui.theme.BordeTextField
@@ -69,26 +66,51 @@ import com.pdm0126.cuidandohuellitas.utils.calculateAge
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Pet_Info(
+    navToHome: () -> Unit,
     navBack: () -> Unit,
     navToHistorial: () -> Unit,
     petId: String, //recibe el id de la mascota para cargar sus datos
     viewModel: Pet_Info_ViewModel = viewModel(factory = Pet_Info_ViewModel.Factory)
 ) {
-    val focusManager = LocalFocusManager.current
 
     val pet by viewModel.pet.collectAsState()
+    val openAlertDialog = remember { mutableStateOf(false) }
     //carga los datos al entrar a la pantalla
+    val guardadoExitoso by viewModel.guardadoExitoso.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+// Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+
+
+    LaunchedEffect(guardadoExitoso) {
+        if (guardadoExitoso == true) {
+            snackbarHostState.showSnackbar("Mascota eliminada correctamente")
+            viewModel.resetState()
+            navToHome() //navega después de mostrar el snackbar
+        }
+    }
+
+    LaunchedEffect(error) {
+        error?.let {
+            snackbarHostState.showSnackbar("Error: $it")
+            viewModel.resetState()
+        }
+    }
+
     LaunchedEffect(petId) {
         viewModel.getPetDetails(petId)
     }
+
     Scaffold(
+        snackbarHost = {SnackbarHost(snackbarHostState)},
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         //usa el nombre del ViewModel o vacío mientras carga
                         text = pet?.name ?: "",
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                         color = Blanco,
@@ -100,6 +122,18 @@ fun Pet_Info(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = "Regresar",
                         modifier = Modifier.clickable { navBack() },
+                        tint = Blanco
+                    )
+                },
+                actions = {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Regresar",
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .clickable {
+                                openAlertDialog.value = true
+                            },
                         tint = Blanco
                     )
                 },
@@ -150,7 +184,7 @@ fun Pet_Info(
                             Icon(
                                 imageVector = Icons.Default.Pets,
                                 contentDescription = null,
-                                tint = Color.White,
+                                tint = Verde,
                                 modifier = Modifier.size(40.dp)
                             )
                         }
@@ -229,7 +263,9 @@ fun Pet_Info(
                 ) {
                     Text(text = "Edad:", fontWeight = FontWeight.Medium, color = Negro)
                     Text(
-                        text = calculateAge(pet?.age ?: ""),//llamando a la funcion para calcular la edad en base a la fecha de la bd
+                        text = calculateAge(
+                            pet?.age ?: ""
+                        ),//llamando a la funcion para calcular la edad en base a la fecha de la bd
                         fontWeight = FontWeight.Normal,
                         color = Negro
                     )
@@ -293,4 +329,21 @@ fun Pet_Info(
             }
         }
     }
+    if (openAlertDialog.value) {
+        when {
+            openAlertDialog.value -> {
+                AlertDialogDelete(
+                    onDismissRequest = { openAlertDialog.value = false },
+                    onConfirmation = {
+                        openAlertDialog.value = false
+                        viewModel.deletePet(petId)
+                        navToHome()
+                    },
+                    dialogTitle = "¿Estas seguro de querer eliminar a ${pet?.name}?",
+                    dialogText = "Esta es una decision definitiva y no se puede revertir",
+                    icon = Icons.Default.Delete
+                )
+            }
+        }
     }
+}

@@ -81,6 +81,20 @@ class PetsRepositoryImpl(
             Result.failure(e)
         }
     }
+    override suspend fun deletePet(petId: String): Result<Unit> {
+        return try {
+            val userId = getCurrentUserId()
+            petsFirestoreDao.deletePet(petId)
+            Log.d(
+                "FirebaseSuccess",
+                "Mascota eliminada correctamente de Firestore con ID de usuario: $userId"
+            )
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("FirebaseError", "Error al eliminar mascota: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
 
     override suspend fun syncPets(): Result<Unit> {
         return try {

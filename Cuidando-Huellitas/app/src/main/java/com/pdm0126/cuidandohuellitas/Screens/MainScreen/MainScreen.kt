@@ -53,6 +53,7 @@ import androidx.compose.runtime.remember
 import com.pdm0126.cuidandohuellitas.Components.BottomNavigationBar
 import com.pdm0126.cuidandohuellitas.Components.LoadingScreen
 import com.pdm0126.cuidandohuellitas.Components.PullToRefresh
+import com.pdm0126.cuidandohuellitas.Data.Model.Pet
 import com.pdm0126.cuidandohuellitas.Navigation.Routes
 import com.pdm0126.cuidandohuellitas.ui.theme.Blanco
 import com.pdm0126.cuidandohuellitas.ui.theme.Celeste
@@ -153,6 +154,15 @@ fun MainScreen(
                         color = Color(0xFF9dbf9e))
 
                     LazyRow(Modifier.fillMaxWidth()){
+                        if (pets.isEmpty()) {
+                            item {
+                                Text("No hay mascotas",
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Blanco
+                                )
+                            }
+                        }
                         items(pets) { pet ->
                             ElevatedCard(
                                 modifier = Modifier.padding(8.dp)

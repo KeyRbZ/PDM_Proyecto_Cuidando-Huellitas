@@ -20,9 +20,6 @@ interface PetsDao {
     @Query("SELECT * FROM pets WHERE id = :petId")
     suspend fun getPetById(petId: String): PetEntity?
 
-    @Delete
-    suspend fun deletePet(pet: PetEntity)
-
     @Query("DELETE FROM pets WHERE userId = :userId")
     suspend fun clearPetsByUser(userId: String)
 }

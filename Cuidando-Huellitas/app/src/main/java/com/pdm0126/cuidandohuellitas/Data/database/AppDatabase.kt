@@ -8,4 +8,5 @@ import com.pdm0126.cuidandohuellitas.Data.database.entities.PetEntity
 @Database(entities = [PetEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun petsDao(): PetsDao
+
 }

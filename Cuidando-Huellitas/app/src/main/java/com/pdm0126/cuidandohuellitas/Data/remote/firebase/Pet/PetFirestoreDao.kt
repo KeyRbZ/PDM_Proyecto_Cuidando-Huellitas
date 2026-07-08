@@ -52,6 +52,13 @@ class PetsFirestoreDao {
             }
     }
 
+    suspend fun deletePet(petId: String) {
+        db.collection("pets")
+            .document(petId)
+            .delete()
+            .await()
+    }
+
     suspend fun getPetsByUser(): List<PetEntity> {
         val userId = auth.currentUser?.uid ?: tempUserId
 

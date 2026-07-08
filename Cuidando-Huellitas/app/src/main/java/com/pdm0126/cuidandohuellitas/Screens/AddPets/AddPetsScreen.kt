@@ -157,7 +157,6 @@ fun AddPet(navBack: () -> Unit,
     var petName by rememberSaveable { mutableStateOf("") }
     var petType by rememberSaveable { mutableStateOf("") }
     var petAge by rememberSaveable { mutableStateOf("") }
-    var petAgeByDate by rememberSaveable { mutableStateOf("") }
     var petWeight by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
@@ -189,6 +188,7 @@ fun AddPet(navBack: () -> Unit,
         },
         containerColor = Celeste
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -334,25 +334,6 @@ fun AddPet(navBack: () -> Unit,
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = "Edad: ", fontWeight = FontWeight.Medium, color = Negro)
                     Spacer(modifier = Modifier.height(8.dp))
-//                    TextField(
-//                        value = petAge,
-//                        onValueChange = { petAge = it },
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .clip(RoundedCornerShape(15.dp))
-//                            .border(1.dp, BordeTextField, RoundedCornerShape(15.dp)),
-//                        colors = TextFieldDefaults.colors(
-//                            focusedContainerColor = BlancoFocused,
-//                            unfocusedContainerColor = Blanco,
-//                            focusedIndicatorColor = BordeTextField,
-//                            unfocusedIndicatorColor = Color.Transparent,
-//                            focusedTextColor = NegroFocused,
-//                            unfocusedTextColor = if (petAge.isNotEmpty()) NegroFocused else Color.Transparent,
-//                            cursorColor = Blanco
-//                        ),
-//                        placeholder = { Text(text = "Ejem: 1 año...") },
-//                        singleLine = true
-//                    )
                     DatePickerFieldToModal(petAge, onAgeSelected = { petAge = it })
                 }
 
