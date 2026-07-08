@@ -1,7 +1,7 @@
 package com.pdm0126.cuidandohuellitas.Navigation
 
-import com.pdm0126.cuidandohuellitas.Navigation.Routes
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
@@ -9,10 +9,11 @@ import com.pdm0126.cuidandohuellitas.Screens.AddPets.AddPet
 import com.pdm0126.cuidandohuellitas.Screens.Historial.HistorialScreen
 import com.pdm0126.cuidandohuellitas.Screens.MainScreen.MainScreen
 import com.pdm0126.cuidandohuellitas.Screens.Pet_Info.Pet_Info
-
+import com.pdm0126.cuidandohuellitas.Screens.Profile.ProfileScreen
+import com.pdm0126.cuidandohuellitas.Screens.Profile.ProfileViewModel
 
 @Composable
-fun Cuidando_Huellitas_App(){
+fun Cuidando_Huellitas_App() {
     val backStack = rememberNavBackStack(Routes.MainScreen)
 
     NavDisplay(
@@ -21,11 +22,11 @@ fun Cuidando_Huellitas_App(){
         entryProvider = entryProvider {
             entry<Routes.MainScreen> {
                 MainScreen(
-                    navToPetInfo = { petId ->  //petId llega del callback
+                    navToPetInfo = { petId ->
                         backStack.add(Routes.PetInfo(petId = petId))
                     },
                     navToAddPet = { backStack.add(Routes.AddPet) },
-                    navToProfile = {backStack.add(Routes.Profile)}
+                    navToProfile = { backStack.add(Routes.Profile) }
                 )
             }
             entry<Routes.PetInfo> { key ->
@@ -49,36 +50,11 @@ fun Cuidando_Huellitas_App(){
                     }
                 )
             }
-
+            entry<Routes.Profile> {
+                ProfileScreen(
+                    navToHome = { backStack.removeLastOrNull() }
+                )
+            }
         }
     )
 }
-//
-//
-//fun RankeUCA_App() {
-//    val backStack = rememberNavBackStack(Routes.Question)
-//
-//    NavDisplay(
-//        backStack = backStack,
-//        onBack = { backStack.removeLastOrNull() },
-//        entryProvider = entryProvider {
-//            entry<Routes.Question> {
-//                QuestionsScreen(
-//                    onQuestionClick = { questionId ->
-//                        backStack.add(Routes.Options(questionId))
-//                    }
-//                )
-//            }
-//            entry<Routes.Options> { key ->
-//                OptionsScreen(
-//                    questionId = key.questionId,
-//                    navigateBack = { backStack.removeLastOrNull() }
-//                )
-//            }
-//        }
-//    )
-//}
-//
-//class RankeUCA_Application : Application(){
-//    val appProvider by lazy { AppProvider(this) }
-//}
