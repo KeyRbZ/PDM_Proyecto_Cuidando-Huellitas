@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.google.firebase.auth.FirebaseAuth
 import com.pdm0126.cuidandohuellitas.CuidandoHuellitasApplication
 import com.pdm0126.cuidandohuellitas.Data.repository.ProfileData
 import com.pdm0126.cuidandohuellitas.Data.repository.ProfileInterface
@@ -25,24 +26,48 @@ class ProfileViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error = _error.asStateFlow()
 
+    private var authListener: FirebaseAuth.AuthStateListener? = null
+
     init {
         getProfile()
+        setupAuthListener()
+    }
+
+    private fun setupAuthListener() {
+        authListener = FirebaseAuth.AuthStateListener { auth ->
+            if (auth.currentUser != null) {
+                getProfile()
+            } else {
+                _profile.value = ProfileData()
+                _isLoading.value = false
+            }
+        }
+        FirebaseAuth.getInstance().addAuthStateListener(authListener!!)
     }
 
     fun getProfile() {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
+
+
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            if (currentUser == null) {
+                _profile.value = ProfileData()
+                _isLoading.value = false
+                return@launch
+            }
+
             profileInterface.getProfile()
                 .onSuccess {
                     _profile.value = it
                 }
                 .onFailure {
                     _profile.value = ProfileData(
-                        name = "maria",
-                        email = "maria.garcia@email.com",
-                        avatar = "🐱",
-                        totalMascotas = 2
+                        name = "Usuario",
+                        email = currentUser.email ?: "",
+                        avatar = "🐾",
+                        totalMascotas = 0
                     )
                     _error.value = null
                 }
@@ -53,8 +78,20 @@ class ProfileViewModel(
     fun updateAvatar(avatar: String) {
         viewModelScope.launch {
             profileInterface.updateAvatar(avatar)
-                .onSuccess { _profile.value = _profile.value.copy(avatar = avatar) }
-                .onFailure { e -> _error.value = e.message ?: "Error al guardar el avatar" }
+                .onSuccess {
+                    _profile.value = _profile.value.copy(avatar = avatar)
+                }
+                .onFailure { e ->
+                    _error.value = e.message ?: "Error al guardar el avatar"
+                }
+        }
+    }
+
+
+    override fun onCleared() {
+        super.onCleared()
+        authListener?.let {
+            FirebaseAuth.getInstance().removeAuthStateListener(it)
         }
     }
 

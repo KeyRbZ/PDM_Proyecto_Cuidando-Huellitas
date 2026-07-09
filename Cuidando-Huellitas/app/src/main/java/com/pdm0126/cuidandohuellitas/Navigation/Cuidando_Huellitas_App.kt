@@ -26,8 +26,54 @@ fun App() {
                     }
                 })
             }
-            entry<Routes.Login> { LoginScreen(onLoginSuccess = { backStack.clear(); backStack.add(Routes.MainScreen) }, onGoToRegister = { backStack.add(Routes.Register) }, onGoToRecovery = { backStack.add(Routes.Recovery) }) }
-            entry<Routes.MainScreen> { MainScreen(navToPetInfo = {}, navToAddPet = {}, navToProfile = { backStack.add(Routes.Profile) }) }
+
+            entry<Routes.Login> {
+                LoginScreen(
+                    onLoginSuccess = {
+                        backStack.clear()
+                        backStack.add(Routes.MainScreen)
+                    },
+                    onGoToRegister = {
+                        backStack.add(Routes.Register)
+                    },
+                    onGoToRecovery = {
+                        backStack.add(Routes.Recovery)
+                    }
+                )
+            }
+
+
+            entry<Routes.Register> {
+                RegisterScreen(
+                    onRegisterSuccess = {
+                        backStack.clear()
+                        backStack.add(Routes.MainScreen)
+                    },
+                    onGoToLogin = {
+                        backStack.removeLastOrNull()
+                    }
+                )
+            }
+
+
+            entry<Routes.Recovery> {
+                RecoveryScreen(
+                    onGoToLogin = {
+                        backStack.removeLastOrNull()
+                    }
+                )
+            }
+
+            entry<Routes.MainScreen> {
+                MainScreen(
+                    navToPetInfo = {},
+                    navToAddPet = {},
+                    navToProfile = {
+                        backStack.add(Routes.Profile)
+                    }
+                )
+            }
+
             entry<Routes.Profile> {
                 ProfileScreen(
                     navToHome = { backStack.removeLastOrNull() },

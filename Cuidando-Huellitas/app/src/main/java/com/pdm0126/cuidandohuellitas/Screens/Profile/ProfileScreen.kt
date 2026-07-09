@@ -10,7 +10,6 @@ import android.util.Base64
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
 import com.pdm0126.cuidandohuellitas.Components.BottomNavigationBar
 import java.io.ByteArrayOutputStream
 
@@ -85,7 +85,20 @@ fun ProfileScreen(
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted -> if (isGranted) cameraLauncher.launch() }
+    ) { isGranted -> if (isGranted) cameraLauncher.launch(null) }
+
+
+    LaunchedEffect(Unit) {
+        viewModel.getProfile()
+    }
+
+
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    LaunchedEffect(currentUser?.uid) {
+        if (currentUser != null) {
+            viewModel.getProfile()
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -99,7 +112,12 @@ fun ProfileScreen(
         }
     ) { padding ->
         if (isLoading) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
             return@Scaffold
@@ -153,8 +171,8 @@ fun ProfileScreen(
             Text("Toca para cambiar", fontSize = 11.sp, color = Color.Gray)
 
             Spacer(Modifier.height(8.dp))
-            Text(profile.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-            Text("Amante de mascotas 🐾", color = Color.Gray)
+            Text(profile.name.ifEmpty { "Usuario" }, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            Text(profile.email.ifEmpty { "Sin correo" }, color = Color.Gray)
 
             // Selector de avatar/foto
             if (editingAvatar) {
@@ -191,25 +209,50 @@ fun ProfileScreen(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier.clickable { showImageMenu = true }
                                 ) {
-                                    Icon(Icons.Outlined.CameraAlt, contentDescription = "Foto", modifier = Modifier.size(20.dp))
+                                    Icon(
+                                        Icons.Outlined.CameraAlt,
+                                        contentDescription = "Foto",
+                                        modifier = Modifier.size(20.dp)
+                                    )
                                 }
                             }
-                            DropdownMenu(expanded = showImageMenu, onDismissRequest = { showImageMenu = false }) {
+                            DropdownMenu(
+                                expanded = showImageMenu,
+                                onDismissRequest = { showImageMenu = false }) {
                                 DropdownMenuItem(
                                     text = { Text("Tomar foto") },
-                                    leadingIcon = { Icon(Icons.Outlined.CameraAlt, contentDescription = null) },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Outlined.CameraAlt,
+                                            contentDescription = null
+                                        )
+                                    },
                                     onClick = {
                                         showImageMenu = false
-                                        val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                                        if (granted) cameraLauncher.launch() else permissionLauncher.launch(Manifest.permission.CAMERA)
+                                        val granted = ContextCompat.checkSelfPermission(
+                                            context,
+                                            Manifest.permission.CAMERA
+                                        ) == PackageManager.PERMISSION_GRANTED
+                                        if (granted) cameraLauncher.launch(null) else permissionLauncher.launch(
+                                            Manifest.permission.CAMERA
+                                        )
                                     }
                                 )
                                 DropdownMenuItem(
                                     text = { Text("Elegir de galería") },
-                                    leadingIcon = { Icon(Icons.Outlined.PhotoLibrary, contentDescription = null) },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Outlined.PhotoLibrary,
+                                            contentDescription = null
+                                        )
+                                    },
                                     onClick = {
                                         showImageMenu = false
-                                        galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                        galleryLauncher.launch(
+                                            PickVisualMediaRequest(
+                                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                                            )
+                                        )
                                     }
                                 )
                             }
@@ -221,7 +264,13 @@ fun ProfileScreen(
                     Spacer(Modifier.height(12.dp))
                     Button(onClick = {
                         val avatarValue: String = when (val image = pendingImage) {
-                            is Uri -> bitmapToBase64(MediaStore.Images.Media.getBitmap(context.contentResolver, image))
+                            is Uri -> bitmapToBase64(
+                                MediaStore.Images.Media.getBitmap(
+                                    context.contentResolver,
+                                    image
+                                )
+                            )
+
                             is Bitmap -> bitmapToBase64(image)
                             else -> profile.avatar
                         }
@@ -241,10 +290,10 @@ fun ProfileScreen(
                     Text("Información Personal", fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(8.dp))
                     Text("Nombre", fontSize = 12.sp, color = Color.Gray)
-                    Text(profile.name)
+                    Text(profile.name.ifEmpty { "Sin nombre" })
                     Spacer(Modifier.height(8.dp))
                     Text("Correo", fontSize = 12.sp, color = Color.Gray)
-                    Text(profile.email)
+                    Text(profile.email.ifEmpty { "Sin correo" })
                 }
             }
 
@@ -254,9 +303,16 @@ fun ProfileScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Estadísticas", fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(8.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(profile.totalMascotas.toString(), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                profile.totalMascotas.toString(),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                             Text("Mascotas", fontSize = 12.sp, color = Color.Gray)
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -274,9 +330,15 @@ fun ProfileScreen(
             Spacer(Modifier.height(24.dp))
 
             Button(
-                onClick = { onLogOut() },
+                onClick = {
+                    onLogOut()
+
+                    viewModel.getProfile()
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                modifier = Modifier.fillMaxWidth().height(50.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
             ) {
                 Text("Cerrar Sesión", color = Color.White)
             }

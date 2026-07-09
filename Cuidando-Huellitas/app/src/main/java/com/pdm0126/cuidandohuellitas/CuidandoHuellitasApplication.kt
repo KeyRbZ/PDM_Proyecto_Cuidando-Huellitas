@@ -10,10 +10,9 @@ import com.pdm0126.cuidandohuellitas.data.auth.AuthRepositoryImpl
 class CuidandoHuellitasApplication : Application() {
     lateinit var appProvider: AppProvider
 
-    // Repositorio de autenticación traído de la rama auth-screens
     val authRepository: AuthRepository by lazy { AuthRepositoryImpl() }
 
-    // Base de datos de Room de la rama profile
+
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
