@@ -1,6 +1,5 @@
 package com.pdm0126.cuidandohuellitas.ui
 
-import androidx.activity.result.launch
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -39,9 +38,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.pdm0126.cuidandohuellitas.CuidandoHuellitasApplication
 import com.pdm0126.cuidandohuellitas.data.auth.AuthRepository
-import com.pdm0126.cuidandohuellitas.data.auth.UsersFirestoreDao
+import com.pdm0126.cuidandohuellitas.Data.remote.firebase.User.UsersFirestoreDao
 import com.pdm0126.cuidandohuellitas.ui.theme.AmarilloAvatar
 import com.pdm0126.cuidandohuellitas.ui.theme.BordeTextField
 import androidx.lifecycle.viewModelScope
@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import android.util.Log
 
 data class RegisterUiState(
     val name: String = "",
@@ -89,19 +90,62 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
         }
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            authRepository.register(current.email, current.password).fold(
-                onSuccess = {
-                    val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
-                    if (uid != null) {
-                        try {
-                            UsersFirestoreDao().saveUser(uid, current.name, avatarValue, current.email)
-                        } catch (e: Exception) {
+            try {
+                authRepository.register(current.email, current.password).fold(
+                    onSuccess = {
+                        Log.d("Register", "Registro exitoso en Auth")
+                        val uid = FirebaseAuth.getInstance().currentUser?.uid
+                        Log.d("Register", "UID: $uid")
+
+                        if (uid != null) {
+                            try {
+                                val usersDao = UsersFirestoreDao()
+                                usersDao.saveUser(
+                                    uid = uid,
+                                    name = current.name,
+                                    avatar = avatarValue,
+                                    email = current.email
+                                )
+                                Log.d("Register", "Usuario guardado en Firestore")
+                                _state.update { it.copy(isLoading = false, isRegisterSuccess = true) }
+                            } catch (e: Exception) {
+                                Log.e("Register", "Error guardando en Firestore: ${e.message}")
+                                _state.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        errorMessage = "Error guardando datos: ${e.message}"
+                                    )
+                                }
+                            }
+                        } else {
+                            Log.e("Register", "UID es null")
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    errorMessage = "Error: no se pudo obtener el UID"
+                                )
+                            }
+                        }
+                    },
+                    onFailure = { e ->
+                        Log.e("Register", "Error en registro: ${e.message}")
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = e.message ?: "Error al registrarse"
+                            )
                         }
                     }
-                    _state.update { it.copy(isLoading = false, isRegisterSuccess = true) }
-                },
-                onFailure = { e -> _state.update { it.copy(isLoading = false, errorMessage = e.message ?: "Error al registrarse") } }
-            )
+                )
+            } catch (e: Exception) {
+                Log.e("Register", "Excepción: ${e.message}")
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Error inesperado: ${e.message}"
+                    )
+                }
+            }
         }
     }
 
@@ -154,7 +198,7 @@ fun RegisterScreen(
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted -> if (isGranted) cameraLauncher.launch() }
+    ) { isGranted -> if (isGranted) cameraLauncher.launch(null) }
 
     LaunchedEffect(state.isRegisterSuccess) {
         if (state.isRegisterSuccess) onRegisterSuccess()
@@ -295,7 +339,7 @@ fun RegisterScreen(
                                     showImageMenu = false
                                     val permissionCheckResult = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                                     if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                                        cameraLauncher.launch()
+                                        cameraLauncher.launch(null)
                                     } else {
                                         permissionLauncher.launch(Manifest.permission.CAMERA)
                                     }

@@ -61,6 +61,10 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
         }
     }
 
+    fun resetLoginState() {
+        _state.update { it.copy(isLoginSuccess = false) }
+    }
+
     companion object {
         fun factory(repository: AuthRepository) = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -81,7 +85,10 @@ fun LoginScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(state.isLoginSuccess) {
-        if (state.isLoginSuccess) onLoginSuccess()
+        if (state.isLoginSuccess) {
+            onLoginSuccess()
+            viewModel.resetLoginState()
+        }
     }
 
     Scaffold(

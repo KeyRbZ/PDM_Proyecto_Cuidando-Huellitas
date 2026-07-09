@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "683780528178",
+    "project_id": "cuidando-huellitas-7c8bb",
+    "storage_bucket": "cuidando-huellitas-7c8bb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:683780528178:android:927877b083b3296004c42b",
+        "android_client_info": {
+          "package_name": "com.CuidandoHuellitas.CuidandoHuellitas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGK_TUfOwaIr9meln-X5IH19DmbAOJhkM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:683780528178:android:9466a4663eadd0e904c42b",
+        "android_client_info": {
+          "package_name": "com.pdm0126.cuidandohuellitas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGK_TUfOwaIr9meln-X5IH19DmbAOJhkM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

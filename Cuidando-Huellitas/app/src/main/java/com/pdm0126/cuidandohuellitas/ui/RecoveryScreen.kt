@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.util.Log
 
 data class RecoveryUiState(
     val email: String = "",
@@ -50,10 +51,31 @@ class RecoveryViewModel(private val authRepository: AuthRepository) : ViewModel(
         }
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            authRepository.sendPasswordReset(current.email).fold(
-                onSuccess = { _state.update { it.copy(isLoading = false, isEmailSent = true) } },
-                onFailure = { e -> _state.update { it.copy(isLoading = false, errorMessage = e.message ?: "Error al enviar instrucciones") } }
-            )
+            try {
+                authRepository.sendPasswordReset(current.email).fold(
+                    onSuccess = {
+                        Log.d("Recovery", "Correo de recuperación enviado")
+                        _state.update { it.copy(isLoading = false, isEmailSent = true) }
+                    },
+                    onFailure = { e ->
+                        Log.e("Recovery", "Error: ${e.message}")
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = e.message ?: "Error al enviar instrucciones"
+                            )
+                        }
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e("Recovery", "Excepción: ${e.message}")
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Error inesperado: ${e.message}"
+                    )
+                }
+            }
         }
     }
 
